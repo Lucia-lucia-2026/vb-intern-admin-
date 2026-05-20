@@ -383,7 +383,7 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
         <div class="topbar-count" id="topbar-count">0명</div>
       </div>
       <div class="topbar-r">
-        <div class="sync-badge" id="sync-badge" onclick="syncNow()">⇄ 동기화</div>
+        <div class="sync-badge" id="sync-badge" onclick="refreshData()" title="클릭: 최신 데이터 불러오기">↻ 새로고침</div>
         <span class="gh-chip" id="gist-label">⬡ Gist</span>
         <span class="chip" id="chip-date"></span>
         <button class="btn-ghost" onclick="exportCSV()">↓ CSV</button>
@@ -659,13 +659,30 @@ async function doLogin(){
   const btn=document.getElementById('btn-login');btn.disabled=true;btn.textContent='확인 중...';
   try{
     const hash=await sha256(pw);
+    // 1차: localStorage 해시 비교 (빠른 실패)
     if(hash!==cfg.passwordHash){errEl.style.display='block';document.getElementById('login-pw').classList.add('err');return;}
-    document.getElementById('screen-login').style.display='none';showLoading('GitHub에서 데이터 불러오는 중...');
+    document.getElementById('screen-login').style.display='none';
+    showLoading('GitHub에서 데이터 불러오는 중...');
     const data=await gistGet();
-    if(data){interns=data.interns||DEFAULT_INTERNS;periods=data.periods||DEFAULT_PERIODS;attData=data.attendance||{};nextId=data.nextId||19;}
-    else{interns=[...DEFAULT_INTERNS];periods=[...DEFAULT_PERIODS];attData={};nextId=19;}
+    // ⑥ Fix: Gist의 실제 비밀번호 해시로 재검증
+    if(data&&data.passwordHash&&data.passwordHash!==hash){
+      // Gist 비밀번호가 변경됨 → localStorage 업데이트 후 거부
+      cfg.passwordHash=data.passwordHash;
+      localStorage.setItem('vb_gh_cfg',JSON.stringify(cfg));
+      hideLoading();
+      document.getElementById('screen-login').style.display='flex';
+      errEl.textContent='다른 기기에서 비밀번호가 변경되었습니다. 새 비밀번호로 다시 로그인하세요.';
+      errEl.style.display='block';
+      return;
+    }
+    if(data){
+      interns=data.interns||DEFAULT_INTERNS;
+      periods=data.periods||DEFAULT_PERIODS;
+      attData=data.attendance||{};
+      nextId=data.nextId||19;
+    }else{interns=[...DEFAULT_INTERNS];periods=[...DEFAULT_PERIODS];attData={};nextId=19;}
     hideLoading();launchApp();
-  }catch(e){errEl.textContent='GitHub 연결 실패: '+e.message;errEl.style.display='block';hideLoading();}
+  }catch(e){errEl.textContent='GitHub 연결 실패: '+e.message;errEl.style.display='block';hideLoading();document.getElementById('screen-login').style.display='flex';}
   finally{btn.disabled=false;btn.textContent='로그인';}
 }
 function doLogout(){document.getElementById('app').classList.remove('show');document.getElementById('login-pw').value='';document.getElementById('login-pw').classList.remove('err');document.getElementById('login-err').style.display='none';document.getElementById('screen-login').style.display='flex';setTimeout(()=>document.getElementById('login-pw').focus(),100);}
@@ -673,14 +690,128 @@ function launchApp(){
   const now=new Date();
   document.getElementById('chip-date').textContent=`${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())}`;
   document.getElementById('gist-label').textContent=`⬡ Gist: ${cfg.gistId.slice(0,8)}...`;
-  buildFilters();renderAll();renderAttTF();renderAtt();document.getElementById('app').classList.add('show');
+  lastSyncTime=Date.now();
+  buildFilters();renderAll();renderAttTF();renderAtt();
+  startAutoRefresh(); // ⑤ 자동 새로고침 시작
+  document.getElementById('app').classList.add('show');
 }
 
 // ══ SYNC ═════════════════════════════════════════════
 function setSB(state,label){const b=document.getElementById('sync-badge');b.className='sync-badge '+state;b.textContent=label;}
-async function syncNow(){setSB('syncing','⇄ 저장 중...');try{await gistPut({passwordHash:cfg.passwordHash,interns,periods,attendance:attData,nextId});setSB('saved','✓ 저장됨');setTimeout(()=>setSB('','⇄ 동기화'),3000);}catch(e){setSB('error','✕ 오류');toast('저장 실패: '+e.message,'err');setTimeout(()=>setSB('','⇄ 동기화'),4000);}}
-function scheduleSave(){clearTimeout(syncTimer);syncTimer=setTimeout(syncNow,3000);setSB('syncing','저장 대기 중...');}
-async function saveAtt(){await syncNow();toast('근무현황이 저장되었습니다.');}
+// ── FIX ①②③: Pull-before-push + 에러 re-throw + 병합 ──────────────
+async function syncNow(){
+  if(!cfg)return;
+  setSB('syncing','⇄ 저장 중...');
+  try{
+    // ① Pull-before-push: 원격 최신 데이터 먼저 가져와서 병합
+    try{
+      const remote=await gistGet();
+      if(remote){
+        // nextId 최댓값으로 병합
+        if((remote.nextId||0)>nextId) nextId=remote.nextId;
+        // 원격에만 있는 신규 인턴 병합
+        const localIds=new Set(interns.map(i=>i.id));
+        const newItems=(remote.interns||[]).filter(i=>!localIds.has(i.id));
+        if(newItems.length){interns=[...interns,...newItems];renderAll();}
+        // 원격에만 있는 근무현황 키 병합 (로컬 우선)
+        const remoteAtt=remote.attendance||{};
+        Object.entries(remoteAtt).forEach(([k,v])=>{if(attData[k]===undefined)attData[k]=v;});
+        // Gist 비밀번호 해시 최신화
+        if(remote.passwordHash&&remote.passwordHash!==cfg.passwordHash){
+          cfg.passwordHash=remote.passwordHash;
+          const saved=JSON.parse(localStorage.getItem('vb_gh_cfg')||'{}');
+          saved.passwordHash=remote.passwordHash;
+          localStorage.setItem('vb_gh_cfg',JSON.stringify(saved));
+        }
+      }
+    }catch(mergeErr){console.warn('병합 중 오류(무시):', mergeErr);}
+
+    await gistPut({passwordHash:cfg.passwordHash,interns,periods,attendance:attData,nextId});
+    setSB('saved','✓ 저장됨');
+    lastSyncTime=Date.now();
+    setTimeout(()=>setSB('','↻ 새로고침'),3000);
+  }catch(e){
+    setSB('error','✕ 저장 실패 — 재시도 클릭');
+    toast('저장 실패: '+e.message,'err');
+    setTimeout(()=>setSB('','↻ 새로고침'),5000);
+    throw e; // ② 에러 re-throw
+  }
+}
+
+// ── FIX ④: 딜레이 1초로 단축 ─────────────────────────────────────────
+function scheduleSave(){clearTimeout(syncTimer);syncTimer=setTimeout(syncNow,1000);setSB('syncing','저장 대기 중...');}
+
+// ── FIX ⑦: saveAtt 수정 (toast 중복 제거, 실패 처리) ──────────────────
+async function saveAtt(){
+  try{await syncNow();toast('근무현황이 GitHub에 저장되었습니다');}
+  catch(e){} // 에러 toast는 syncNow에서 이미 처리
+}
+
+// ── FIX ⑤: 수동 새로고침 + 자동 새로고침 ──────────────────────────────
+let lastSyncTime=0,autoRefreshTimer=null;
+
+async function refreshData(){
+  if(!cfg)return;
+  setSB('syncing','↻ 새로고침 중...');
+  try{
+    const data=await gistGet();
+    if(data){
+      // 비밀번호 해시 최신화 (⑥ 수정)
+      if(data.passwordHash){
+        cfg.passwordHash=data.passwordHash;
+        const saved=JSON.parse(localStorage.getItem('vb_gh_cfg')||'{}');
+        saved.passwordHash=data.passwordHash;
+        localStorage.setItem('vb_gh_cfg',JSON.stringify(saved));
+      }
+      interns=data.interns||DEFAULT_INTERNS;
+      periods=data.periods||DEFAULT_PERIODS;
+      attData=data.attendance||{};
+      nextId=data.nextId||19;
+      renderAll();
+      if(document.getElementById('tab-attendance').classList.contains('active'))renderAtt();
+      if(document.getElementById('tab-settings').classList.contains('active'))renderPeriods();
+      lastSyncTime=Date.now();
+      toast('최신 데이터로 업데이트되었습니다');
+    }
+    setSB('saved','✓ 최신 데이터');
+    setTimeout(()=>setSB('','↻ 새로고침'),3000);
+  }catch(e){
+    setSB('error','✕ 새로고침 실패');
+    toast('새로고침 실패: '+e.message,'err');
+    setTimeout(()=>setSB('','↻ 새로고침'),4000);
+  }
+}
+
+function startAutoRefresh(){
+  clearInterval(autoRefreshTimer);
+  // 2분마다 자동 새로고침 (pending save 없을 때만)
+  autoRefreshTimer=setInterval(()=>{
+    if(cfg&&!syncTimer&&document.visibilityState==='visible'){
+      refreshData().catch(()=>{});
+    }
+  },120000);
+}
+
+// ── FIX ③: 탭/브라우저 종료 시 즉시 저장 시도 ──────────────────────────
+window.addEventListener('beforeunload',()=>{
+  if(cfg&&syncTimer){
+    clearTimeout(syncTimer);
+    // 동기식 저장 시도 (beacon API 사용)
+    const payload=JSON.stringify({passwordHash:cfg.passwordHash,interns,periods,attendance:attData,nextId});
+    const blob=new Blob([JSON.stringify({files:{[GIST_FILE]:{content:payload}}})],{type:'application/json'});
+    navigator.sendBeacon&&navigator.sendBeacon(
+      `https://api.github.com/gists/${cfg.gistId}`,blob
+    );
+  }
+});
+
+// 탭 가시성 변경 시 복귀하면 새로고침
+document.addEventListener('visibilitychange',()=>{
+  if(cfg&&document.visibilityState==='visible'){
+    const elapsed=Date.now()-lastSyncTime;
+    if(elapsed>60000)refreshData().catch(()=>{}); // 1분 이상 자리 비웠으면 새로고침
+  }
+});
 
 // ══ TAB ══════════════════════════════════════════════
 function goTab(tab,el){
@@ -843,9 +974,9 @@ function savePeriod(){
   if(!label){inp.classList.add('err');toast('기간명을 입력해주세요','err');return;}
   if(pfEditing){const idx=periods.findIndex(p=>p.id===pfEditing);periods[idx]={...periods[idx],label,colorIdx:pfColorIdx};toast('참여기간이 수정되었습니다');}
   else{periods.push({id:'p_'+Date.now(),label,colorIdx:pfColorIdx});toast(`'${label}' 기간이 추가되었습니다`);}
-  closePeriodForm();renderPeriods();populatePeriodSelect();populatePeriodFilter();renderDashboard();scheduleSave();
+  closePeriodForm();renderPeriods();populatePeriodSelect();populatePeriodFilter();renderDashboard();syncNow().catch(()=>{});
 }
-function deletePeriod(id){const n=interns.filter(i=>i.period===id).length;if(n>0){toast(`${n}명이 사용 중인 기간은 삭제할 수 없습니다`,'err');return;}const p=getPeriod(id);periods=periods.filter(p=>p.id!==id);toast(`'${p.label}' 기간이 삭제되었습니다`);renderPeriods();populatePeriodSelect();populatePeriodFilter();renderDashboard();scheduleSave();}
+function deletePeriod(id){const n=interns.filter(i=>i.period===id).length;if(n>0){toast(`${n}명이 사용 중인 기간은 삭제할 수 없습니다`,'err');return;}const p=getPeriod(id);periods=periods.filter(p=>p.id!==id);toast(`'${p.label}' 기간이 삭제되었습니다`);renderPeriods();populatePeriodSelect();populatePeriodFilter();renderDashboard();syncNow().catch(()=>{});}
 
 // ══ ROSTER ═══════════════════════════════════════════
 function buildFilters(){const sel=document.getElementById('q-team');sel.innerHTML='<option value="">전체 팀</option>';TEAMS.forEach(t=>sel.innerHTML+=`<option>${t}</option>`);populatePeriodFilter();}
@@ -870,13 +1001,15 @@ function saveIntern(){
   const data={name:document.getElementById('f-name').value.trim(),grade:document.getElementById('f-grade').value,univ:document.getElementById('f-univ').value.trim(),major:document.getElementById('f-major').value.trim(),phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),role:document.getElementById('f-role').value,subrole:document.getElementById('f-subrole').value.trim(),team:document.getElementById('f-team').value,period:document.getElementById('f-period').value,start:document.getElementById('f-start').value,end:document.getElementById('f-end').value,note:document.getElementById('f-note').value.trim()};
   if(editingId){const idx=interns.findIndex(i=>i.id===editingId);interns[idx]={...interns[idx],...data};toast(`${data.name} 정보가 수정되었습니다`);}
   else{interns.push({id:nextId++,...data});toast(`${data.name}이(가) 등록되었습니다`);}
-  closeDrawer();renderAll();scheduleSave();
+  closeDrawer();renderAll();
+  // ④ 중요 작업: 즉시 저장 (지연 없음)
+  syncNow().catch(()=>{});
 }
 
 // ══ DELETE ═══════════════════════════════════════════
 function showDel(id){pendingDelId=id;const i=interns.find(x=>x.id===id);document.getElementById('del-sub').textContent=`${i.name} (${i.team})을(를) 삭제합니다.`;document.getElementById('del-ov').classList.add('show');document.getElementById('del-confirm').classList.add('show');}
 function closeDelConfirm(){document.getElementById('del-ov').classList.remove('show');document.getElementById('del-confirm').classList.remove('show');pendingDelId=null;}
-function confirmDel(){const i=interns.find(x=>x.id===pendingDelId);interns=interns.filter(x=>x.id!==pendingDelId);toast(`${i.name}이(가) 삭제되었습니다`);closeDelConfirm();renderAll();scheduleSave();}
+function confirmDel(){const i=interns.find(x=>x.id===pendingDelId);interns=interns.filter(x=>x.id!==pendingDelId);toast(`${i.name}이(가) 삭제되었습니다`);closeDelConfirm();renderAll();syncNow().catch(()=>{});}
 
 // ══ ATTENDANCE ═══════════════════════════════════════
 function chMonth(d){curMonth+=d;if(curMonth<0){curMonth=11;curYear--;}if(curMonth>11){curMonth=0;curYear++;}document.getElementById('mo-label').textContent=`${curYear}년 ${KO_MONTHS[curMonth]}`;renderAtt();}
