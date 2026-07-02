@@ -592,6 +592,7 @@ const DEFAULT_INTERNS=[
 // ══ STATE ════════════════════════════════════════════
 let cfg=null,interns=[],periods=[],attData={},nextId=19;
 let editingId=null,pendingDelId=null,pfEditing=null,pfColorIdx=0;
+let deletedIds=new Set(); // ⑧ Fix: 삭제된 인턴 ID를 기억해 병합 시 되살아나지 않도록 함
 let curMonth=6,curYear=2025,attTeam='all',ganttFilter='all',syncTimer=null;
 
 // ══ UTILS ════════════════════════════════════════════
@@ -711,7 +712,7 @@ async function syncNow(){
         if((remote.nextId||0)>nextId) nextId=remote.nextId;
         // 원격에만 있는 신규 인턴 병합
         const localIds=new Set(interns.map(i=>i.id));
-        const newItems=(remote.interns||[]).filter(i=>!localIds.has(i.id));
+        const newItems=(remote.interns||[]).filter(i=>!localIds.has(i.id)&&!deletedIds.has(i.id));
         if(newItems.length){interns=[...interns,...newItems];renderAll();}
         // 원격에만 있는 근무현황 키 병합 (로컬 우선)
         const remoteAtt=remote.attendance||{};
@@ -1009,7 +1010,7 @@ function saveIntern(){
 // ══ DELETE ═══════════════════════════════════════════
 function showDel(id){pendingDelId=id;const i=interns.find(x=>x.id===id);document.getElementById('del-sub').textContent=`${i.name} (${i.team})을(를) 삭제합니다.`;document.getElementById('del-ov').classList.add('show');document.getElementById('del-confirm').classList.add('show');}
 function closeDelConfirm(){document.getElementById('del-ov').classList.remove('show');document.getElementById('del-confirm').classList.remove('show');pendingDelId=null;}
-function confirmDel(){const i=interns.find(x=>x.id===pendingDelId);interns=interns.filter(x=>x.id!==pendingDelId);toast(`${i.name}이(가) 삭제되었습니다`);closeDelConfirm();renderAll();syncNow().catch(()=>{});}
+function confirmDel(){const i=interns.find(x=>x.id===pendingDelId);deletedIds.add(pendingDelId);interns=interns.filter(x=>x.id!==pendingDelId);toast(`${i.name}이(가) 삭제되었습니다`);closeDelConfirm();renderAll();syncNow().catch(()=>{});}
 
 // ══ ATTENDANCE ═══════════════════════════════════════
 function chMonth(d){curMonth+=d;if(curMonth<0){curMonth=11;curYear--;}if(curMonth>11){curMonth=0;curYear++;}document.getElementById('mo-label').textContent=`${curYear}년 ${KO_MONTHS[curMonth]}`;renderAtt();}
