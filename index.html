@@ -556,11 +556,11 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
       <div class="form-section-title">기본 정보</div>
       <div class="form-row c2">
         <div class="form-group"><label class="form-label">이름<span class="req">*</span></label><input class="form-input" id="f-name" placeholder="홍길동"></div>
-        <div class="form-group"><label class="form-label">학년<span class="req">*</span></label><select class="form-select" id="f-grade"><option value="">선택</option><option>1학년</option><option>2학년</option><option>3학년</option><option>4학년</option><option>대학원생</option><option>졸업예정</option></select></div>
+        <div class="form-group"><label class="form-label">학년<span class="req">*</span></label><select class="form-select" id="f-grade"><option value="">선택</option><option>1학년</option><option>2학년</option><option>3학년</option><option>4학년</option><option>대학원생</option><option>졸업예정</option><option>해당사항없음</option></select></div>
       </div>
       <div class="form-row c2">
         <div class="form-group"><label class="form-label">대학교<span class="req">*</span></label><input class="form-input" id="f-univ" placeholder="○○대학교"></div>
-        <div class="form-group"><label class="form-label">전공<span class="req">*</span></label><input class="form-input" id="f-major" placeholder="경영학과"></div>
+        <div class="form-group"><div style="display:flex;align-items:center;justify-content:space-between"><label class="form-label" style="margin-bottom:0">전공<span class="req">*</span></label><label style="font-weight:400;font-size:11px;color:var(--t3);display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-bottom:6px"><input type="checkbox" id="f-major-na" onchange="toggleMajorNA()" style="cursor:pointer">해당없음</label></div><input class="form-input" id="f-major" placeholder="경영학과"></div>
       </div>
       <div class="form-row c2">
         <div class="form-group"><label class="form-label">연락처</label><input class="form-input" id="f-phone" placeholder="010-0000-0000"></div>
@@ -652,10 +652,11 @@ function isHol(d){return HOLIDAYS.has(toKey(d));}
 function workDays(y,m){const r=[];const d=new Date(y,m,1);while(d.getMonth()===m){if(d.getDay()>=1&&d.getDay()<=5)r.push(new Date(d));d.setDate(d.getDate()+1);}return r;}
 function getWeekNum(date){const d=new Date(date);while(d.getDay()!==0)d.setDate(d.getDate()-1);return Math.floor((d-FIRST_SUNDAY)/(7*864e5))+1;}
 function byWeek(days){const w={};days.forEach(d=>{const n=getWeekNum(d);if(!w[n])w[n]={num:n,days:[]};w[n].days.push(d);});return Object.values(w).sort((a,b)=>a.num-b.num);}
+const NONE_PERIOD_ID='__NONE__';
 function getPeriod(id){return periods.find(p=>p.id===id)||null;}
-function pBg(id){const p=getPeriod(id);return p?PERIOD_COLORS[p.colorIdx].bg:'#EBEBEB';}
-function pFg(id){const p=getPeriod(id);return p?PERIOD_COLORS[p.colorIdx].fg:'#3A3A42';}
-function pLabel(id){const p=getPeriod(id);return p?p.label:id||'미정';}
+function pBg(id){if(id===NONE_PERIOD_ID)return'#EBEBEB';const p=getPeriod(id);return p?PERIOD_COLORS[p.colorIdx].bg:'#EBEBEB';}
+function pFg(id){if(id===NONE_PERIOD_ID)return'#6B6B70';const p=getPeriod(id);return p?PERIOD_COLORS[p.colorIdx].fg:'#3A3A42';}
+function pLabel(id){if(id===NONE_PERIOD_ID)return'해당사항없음';const p=getPeriod(id);return p?p.label:id||'미정';}
 function getStatus(start,end){const t=new Date();t.setHours(0,0,0,0);const s=new Date(start),e=new Date(end);if(t<s)return{label:'예정',bg:'#E6F1FB',fg:'#0C447C'};if(t>e)return{label:'완료',bg:'#EBEBEB',fg:'#5A5A5A'};return{label:'진행중',bg:'#E1F5EE',fg:'#0C6B51'};}
 function isActiveInMonth(intern,year,month){const first=new Date(year,month,1),last=new Date(year,month+1,0);const s=new Date(intern.start),e=new Date(intern.end);return s<=last&&e>=first;}
 async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
@@ -883,6 +884,7 @@ function renderSidebar(){
   document.getElementById('sb-stats').innerHTML=[['총 인원',interns.length+'명'],['진행중',active+'명'],['예정',upcoming+'명'],['완료',(interns.length-active-upcoming)+'명']].map(([k,v])=>`<div class="sb-stat"><span class="sb-stat-k">${k}</span><span class="sb-stat-v">${v}</span></div>`).join('');
   document.getElementById('topbar-count').textContent=`총 ${interns.length}명`;
 }
+function toggleMajorNA(){const chk=document.getElementById('f-major-na'),inp=document.getElementById('f-major');if(chk.checked){inp.value='해당사항없음';inp.disabled=true;}else{inp.disabled=false;if(inp.value==='해당사항없음')inp.value='';inp.focus();}}
 function jumpToTeam(t){goTab('attendance',document.querySelector('.nav-item:nth-child(3)'));attTeam=t;renderAttTF();renderAtt();}
 
 // ══ DASHBOARD ════════════════════════════════════════
@@ -1084,7 +1086,7 @@ function deletePeriod(id){const n=interns.filter(i=>i.period===id).length;if(n>0
 // ══ ROSTER ═══════════════════════════════════════════
 function buildFilters(){const sel=document.getElementById('q-team');sel.innerHTML='<option value="">전체 팀</option>';TEAMS.forEach(t=>sel.innerHTML+=`<option>${t}</option>`);populatePeriodFilter();}
 function populatePeriodFilter(){const sel=document.getElementById('q-period');const cur=sel.value;sel.innerHTML='<option value="">전체 기간</option>';periods.forEach(p=>sel.innerHTML+=`<option value="${p.id}">${p.label}</option>`);if(cur)sel.value=cur;}
-function populatePeriodSelect(){const sel=document.getElementById('f-period');const cur=sel.value;sel.innerHTML='<option value="">선택</option>';periods.forEach(p=>sel.innerHTML+=`<option value="${p.id}">${p.label}</option>`);if(cur)sel.value=cur;}
+function populatePeriodSelect(){const sel=document.getElementById('f-period');const cur=sel.value;sel.innerHTML='<option value="">선택</option>';periods.forEach(p=>sel.innerHTML+=`<option value="${p.id}">${p.label}</option>`);sel.innerHTML+=`<option value="${NONE_PERIOD_ID}">해당사항없음</option>`;if(cur)sel.value=cur;}
 function renderRoster(){
   const q=document.getElementById('q-name').value.trim(),qt=document.getElementById('q-team').value,qr=document.getElementById('q-role').value,qp=document.getElementById('q-period').value,qs=document.getElementById('q-status').value;
   const list=interns.filter(i=>{if(q&&!i.name.includes(q))return false;if(qt&&i.team!==qt)return false;if(qr&&i.role!==qr)return false;if(qp&&i.period!==qp)return false;if(qs&&getStatus(i.start,i.end).label!==qs)return false;return true;});
@@ -1094,7 +1096,7 @@ function renderRoster(){
 }
 
 // ══ DRAWER ═══════════════════════════════════════════
-function openDrawer(id=null){editingId=id;document.querySelectorAll('.form-input,.form-select,.form-textarea').forEach(el=>el.classList.remove('err'));populatePeriodSelect();if(id){const i=interns.find(x=>x.id===id);document.getElementById('drawer-title').textContent='인턴 정보 수정';document.getElementById('drawer-sub').textContent=`${i.name}의 정보를 수정합니다`;['name','grade','univ','major','phone','email','role','subrole','team','period','start','end','note'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value=i[k]||'';});}else{document.getElementById('drawer-title').textContent='인턴 등록';document.getElementById('drawer-sub').textContent='새 인턴 정보를 입력하세요';['name','univ','major','phone','email','subrole','note'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value='';});['grade','role','team','period'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value='';});document.getElementById('f-start').value='2025-07-01';document.getElementById('f-end').value='2025-08-31';}updateTPreview();document.getElementById('overlay').classList.add('show');document.getElementById('drawer').classList.add('open');}
+function openDrawer(id=null){editingId=id;document.querySelectorAll('.form-input,.form-select,.form-textarea').forEach(el=>el.classList.remove('err'));populatePeriodSelect();if(id){const i=interns.find(x=>x.id===id);document.getElementById('drawer-title').textContent='인턴 정보 수정';document.getElementById('drawer-sub').textContent=`${i.name}의 정보를 수정합니다`;['name','grade','univ','major','phone','email','role','subrole','team','period','start','end','note'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value=i[k]||'';});const majorNA=i.major==='해당사항없음';document.getElementById('f-major-na').checked=majorNA;document.getElementById('f-major').disabled=majorNA;}else{document.getElementById('drawer-title').textContent='인턴 등록';document.getElementById('drawer-sub').textContent='새 인턴 정보를 입력하세요';['name','univ','major','phone','email','subrole','note'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value='';});['grade','role','team','period'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value='';});document.getElementById('f-major-na').checked=false;document.getElementById('f-major').disabled=false;document.getElementById('f-start').value='2025-07-01';document.getElementById('f-end').value='2025-08-31';}updateTPreview();document.getElementById('overlay').classList.add('show');document.getElementById('drawer').classList.add('open');}
 function closeDrawer(){document.getElementById('overlay').classList.remove('show');document.getElementById('drawer').classList.remove('open');editingId=null;}
 function updateTPreview(){const t=document.getElementById('f-team').value,dot=document.getElementById('tp-dot'),name=document.getElementById('tp-name'),prev=document.getElementById('team-preview');if(t&&TC[t]){dot.style.background=TC[t].dark;name.textContent=t;name.style.color=TC[t].dark;prev.style.background=TC[t].light;prev.style.borderColor=TC[t].mid;}else{dot.style.background='transparent';name.textContent='팀을 선택하세요';name.style.color='var(--t4)';prev.style.background='var(--bg)';prev.style.borderColor='var(--border2)';}}
 function saveIntern(){
