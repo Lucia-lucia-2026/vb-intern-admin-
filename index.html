@@ -103,7 +103,7 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;font
 @keyframes fadeUp{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
 
 /* STAT CARDS */
-.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px;}
 .stat-card{background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:var(--sh);border:1px solid var(--border2);position:relative;overflow:hidden;}
 .stat-card::before{content:'';position:absolute;top:0;right:0;width:3px;height:100%;background:var(--accent,#888);}
 .stat-label{font-size:10px;color:var(--t3);margin-bottom:4px;}
@@ -138,6 +138,40 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;font
 .hm-leg-label{font-size:10px;color:var(--t3);}
 .hm-leg-items{display:flex;gap:8px;align-items:center;}
 .hm-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t2);}
+
+/* ═══ STAFFING (필요인원 대비 충원현황) ═══════════════ */
+.staff-wrap{background:var(--card);border-radius:12px;box-shadow:var(--sh);border:1px solid var(--border2);overflow:hidden;margin-bottom:16px;}
+.staff-summary{padding:10px 16px;border-bottom:1px solid var(--border2);font-size:11.5px;line-height:1.6;background:#FFFBF5;color:#8F570A;}
+.staff-summary.ok{background:#F2FAF6;color:#0C6B51;}
+.staff-summary b{font-weight:700;}
+.staff-scroll{overflow-x:auto;}
+.staff-scroll::-webkit-scrollbar{height:4px;}
+.staff-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.staff-table{border-collapse:collapse;width:100%;min-width:700px;}
+.staff-table th,.staff-table td{border:1px solid var(--border2);}
+.staff-head-team{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;padding:9px 14px;background:#FAFAF8;white-space:nowrap;min-width:110px;}
+.staff-head-month{font-size:11px;font-weight:600;text-align:center;padding:7px 8px;background:#FAFAF8;white-space:nowrap;min-width:64px;}
+.staff-head-month .mo-name{color:var(--t1);}
+.staff-head-month .mo-year{font-size:9px;color:var(--t4);display:block;}
+.staff-team-label{padding:10px 14px;white-space:nowrap;}
+.staff-team-name{font-size:12px;font-weight:500;display:flex;align-items:center;gap:7px;}
+.staff-team-need{font-size:10px;color:var(--t4);font-weight:400;}
+.staff-cell{text-align:center;padding:8px 4px;cursor:default;transition:filter .15s;}
+.staff-cell:hover{filter:brightness(.95);}
+.staff-cell.short{background:#FCEAEA;}
+.staff-cell.ok{background:#E1F5EE;}
+.staff-cell.over{background:#FFF3E0;}
+.staff-count{font-size:13px;font-weight:700;font-family:'DM Mono',monospace;line-height:1;}
+.staff-cell.short .staff-count{color:#B4232E;}
+.staff-cell.ok .staff-count{color:#0C6B51;}
+.staff-cell.over .staff-count{color:#8F570A;}
+.staff-diff{font-size:9px;margin-top:2px;font-weight:600;}
+.staff-cell.short .staff-diff{color:#B4232E;}
+.staff-cell.ok .staff-diff{color:#0C6B51;opacity:.7;}
+.staff-cell.over .staff-diff{color:#8F570A;}
+.staff-legend{display:flex;align-items:center;gap:16px;padding:10px 16px;border-top:1px solid var(--border2);background:#FAFAF8;flex-wrap:wrap;}
+.staff-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t2);}
+.staff-leg-dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
 .hm-leg-dot{width:12px;height:12px;border-radius:3px;}
 
 /* ═══ GANTT ═════════════════════════════════════════ */
@@ -416,6 +450,21 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
           </div>
         </div>
 
+        <!-- 1.5 팀별 필요인원 대비 월별 충원현황 -->
+        <div class="sec-head">
+          <div class="sec-title">🎯 팀별 필요인원 대비 충원현황</div>
+          <div style="font-size:10px;color:var(--t4)">실제인원 / 필요인원</div>
+        </div>
+        <div class="staff-wrap">
+          <div class="staff-summary" id="staff-summary"></div>
+          <div class="staff-scroll"><table class="staff-table" id="staff-table"></table></div>
+          <div class="staff-legend">
+            <span class="staff-leg-item"><span class="staff-leg-dot" style="background:#FCEAEA;border:1px solid #F0C8C8"></span>부족</span>
+            <span class="staff-leg-item"><span class="staff-leg-dot" style="background:#E1F5EE;border:1px solid #C3E9DA"></span>충족</span>
+            <span class="staff-leg-item"><span class="staff-leg-dot" style="background:#FFF3E0;border:1px solid #F2DDB0"></span>과다</span>
+          </div>
+        </div>
+
         <!-- 2. 인턴 참여기간 타임라인 (간트) -->
         <div class="sec-head">
           <div class="sec-title">📅 인턴 참여기간 타임라인</div>
@@ -558,6 +607,7 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
 <script>
 // ══ CONSTANTS ════════════════════════════════════════
 const TEAMS=['마케팅팀','브랜드팀','디자인팀','커머스팀','Biz팀'];
+const TEAM_NEEDS={'브랜드팀':4,'마케팅팀':4,'커머스팀':1,'Biz팀':1,'디자인팀':1}; // 팀별 필요인턴수
 const TC={'마케팅팀':{dark:'#4F46B8',light:'#EEEDFE',mid:'#AFA9EC',r:79,g:70,b:184},'브랜드팀':{dark:'#0C6B51',light:'#E1F5EE',mid:'#5CC8A0',r:12,g:107,b:81},'디자인팀':{dark:'#8F570A',light:'#FFF3E0',mid:'#EDA827',r:143,g:87,b:10},'커머스팀':{dark:'#155FA3',light:'#E6F1FB',mid:'#82B5E9',r:21,g:95,b:163},'Biz팀':{dark:'#852343',light:'#FBEAF0',mid:'#E48BAF',r:133,g:35,b:67}};
 const HOLIDAYS=new Set(['2025-05-01','2025-05-05','2025-05-06','2025-06-06','2025-08-15','2025-10-03','2025-10-06','2025-10-07','2025-10-08','2025-10-09','2025-12-25']);
 const STATUS_CYCLE=['','O','X','△','연','재'];
@@ -840,15 +890,26 @@ function renderDashboard(){
   const active=interns.filter(i=>getStatus(i.start,i.end).label==='진행중').length;
   const upcoming=interns.filter(i=>getStatus(i.start,i.end).label==='예정').length;
   const done=interns.length-active-upcoming;
+
+  // 이번 달 충원율 계산 (필요인원 설정된 팀 기준)
+  const now=new Date(),curY=now.getFullYear(),curM=now.getMonth();
+  const needTeams=Object.keys(TEAM_NEEDS);
+  const totalNeed=needTeams.reduce((s,t)=>s+TEAM_NEEDS[t],0);
+  const totalActualNow=needTeams.reduce((s,t)=>s+interns.filter(i=>i.team===t&&isActiveInMonth(i,curY,curM)).length,0);
+  const fillRate=totalNeed>0?Math.round(totalActualNow/totalNeed*100):0;
+  const fillColor=fillRate<100?'#B4232E':fillRate===100?'#0C6B51':'#8F570A';
+
   document.getElementById('dash-stats').innerHTML=[
     {l:'총 인턴',v:interns.length,s:'전체 등록 인원',a:'#4F46B8'},
     {l:'진행중',v:active,s:'현재 활동 인원',a:'#0C6B51'},
     {l:'예정',v:upcoming,s:'참여 예정 인원',a:'#155FA3'},
     {l:'완료',v:done,s:'종료된 인원',a:'#AAA9A6'},
     {l:'기간 유형',v:periods.length,s:'설정된 참여기간 수',a:'#8F570A'},
+    {l:'이번 달 충원율',v:`${fillRate}%`,s:`${totalActualNow}/${totalNeed}명 (${KO_MONTHS[curM]})`,a:fillColor},
   ].map(s=>`<div class="stat-card" style="--accent:${s.a}"><div class="stat-label">${s.l}</div><div class="stat-value">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('');
 
   renderHeatmap();
+  renderStaffing();
   renderGantt();
 
   const mx=Math.max(1,...TEAMS.map(t=>interns.filter(i=>i.team===t).length));
@@ -891,6 +952,47 @@ function renderHeatmap(){
   });
   h+='</tr></tbody>';
   document.getElementById('hm-table').innerHTML=h;
+}
+
+// ══ STAFFING (필요인원 대비 충원현황) ═══════════════════
+function renderStaffing(){
+  const months=getTimelineMonths();
+  const teams=Object.keys(TEAM_NEEDS);
+  const shortages=[]; // {team,year,month,diff}
+
+  let h='<thead><tr><th class="staff-head-team">팀 (필요인원)</th>';
+  months.forEach(({year,month})=>{h+=`<th class="staff-head-month"><span class="mo-name">${KO_MONTHS[month]}</span><span class="mo-year">${year}</span></th>`;});
+  h+='</tr></thead><tbody>';
+
+  teams.forEach(team=>{
+    const need=TEAM_NEEDS[team],c=TC[team];
+    h+=`<tr><td class="staff-team-label"><div class="staff-team-name"><span style="width:8px;height:8px;border-radius:50%;background:${c?c.dark:'#888'};flex-shrink:0;display:inline-block"></span>${team} <span class="staff-team-need">(필요 ${need}명)</span></div></td>`;
+    months.forEach(({year,month})=>{
+      const actual=interns.filter(i=>i.team===team&&isActiveInMonth(i,year,month)).length;
+      const diff=actual-need;
+      const cls=diff<0?'short':diff===0?'ok':'over';
+      if(diff<0)shortages.push({team,year,month,diff});
+      const diffLabel=diff===0?'충족':(diff>0?`+${diff}`:`${diff}`);
+      const names=interns.filter(i=>i.team===team&&isActiveInMonth(i,year,month)).map(i=>i.name).join(', ')||'없음';
+      h+=`<td class="staff-cell ${cls}" title="${team} ${KO_MONTHS[month]}: ${names}"><div class="staff-count">${actual}/${need}</div><div class="staff-diff">${diffLabel}</div></td>`;
+    });
+    h+='</tr>';
+  });
+  h+='</tbody>';
+  document.getElementById('staff-table').innerHTML=h;
+
+  // 요약 배지
+  const sumEl=document.getElementById('staff-summary');
+  if(shortages.length===0){
+    sumEl.className='staff-summary ok';
+    sumEl.innerHTML='✅ 모든 팀이 전 기간 필요인원을 충족하고 있습니다.';
+  }else{
+    const byTeam={};
+    shortages.forEach(s=>{(byTeam[s.team]=byTeam[s.team]||[]).push(`${KO_MONTHS[s.month]}(${s.diff}명)`);});
+    const parts=Object.entries(byTeam).map(([team,list])=>`<b>${team}</b> ${list.join(', ')}`);
+    sumEl.className='staff-summary';
+    sumEl.innerHTML=`⚠️ 인원 부족: ${parts.join(' · ')}`;
+  }
 }
 
 // ══ GANTT ════════════════════════════════════════════
