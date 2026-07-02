@@ -141,6 +141,15 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;font
 
 /* ═══ STAFFING (필요인원 대비 충원현황) ═══════════════ */
 .staff-wrap{background:var(--card);border-radius:12px;box-shadow:var(--sh);border:1px solid var(--border2);overflow:hidden;margin-bottom:16px;}
+.btn-edit-needs{font-size:10.5px;font-weight:500;color:var(--t3);background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:4px 9px;cursor:pointer;transition:background .15s;}
+.btn-edit-needs:hover{background:#F0EEE9;}
+.team-needs-form{background:#FAFAF8;border:1px solid var(--border2);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
+.tn-form-title{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:10px;}
+.tn-form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+.tn-form-item{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;}
+.tn-form-item label{font-size:11.5px;font-weight:500;color:var(--t2);display:flex;align-items:center;gap:6px;}
+.tn-form-item input{width:48px;text-align:center;border:1px solid var(--border2);border-radius:6px;padding:4px 2px;font-family:'DM Mono',monospace;font-size:12px;}
+.tn-form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
 .staff-summary{padding:10px 16px;border-bottom:1px solid var(--border2);font-size:11.5px;line-height:1.6;background:#FFFBF5;color:#8F570A;}
 .staff-summary.ok{background:#F2FAF6;color:#0C6B51;}
 .staff-summary b{font-weight:700;}
@@ -453,7 +462,15 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
         <!-- 1.5 팀별 필요인원 대비 월별 충원현황 -->
         <div class="sec-head">
           <div class="sec-title">🎯 팀별 필요인원 대비 충원현황</div>
-          <div style="font-size:10px;color:var(--t4)">실제인원 / 필요인원</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:10px;color:var(--t4)">실제인원 / 필요인원</span>
+            <button class="btn-edit-needs" id="btn-edit-needs" onclick="openTeamNeedsForm()">✏️ 필요인원 수정</button>
+          </div>
+        </div>
+        <div class="team-needs-form" id="team-needs-form" style="display:none">
+          <div class="tn-form-title">팀별 필요인원 설정</div>
+          <div class="tn-form-grid" id="tn-form-grid"></div>
+          <div class="tn-form-actions"><button class="pf-cancel" onclick="closeTeamNeedsForm()">취소</button><button class="pf-save" onclick="saveTeamNeeds()">저장</button></div>
         </div>
         <div class="staff-wrap">
           <div class="staff-summary" id="staff-summary"></div>
@@ -464,6 +481,7 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
             <span class="staff-leg-item"><span class="staff-leg-dot" style="background:#FFF3E0;border:1px solid #F2DDB0"></span>과다</span>
           </div>
         </div>
+
 
         <!-- 2. 인턴 참여기간 타임라인 (간트) -->
         <div class="sec-head">
@@ -607,7 +625,8 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
 <script>
 // ══ CONSTANTS ════════════════════════════════════════
 const TEAMS=['마케팅팀','브랜드팀','디자인팀','커머스팀','Biz팀'];
-const TEAM_NEEDS={'브랜드팀':4,'마케팅팀':4,'커머스팀':1,'Biz팀':1,'디자인팀':1}; // 팀별 필요인턴수
+const DEFAULT_TEAM_NEEDS={'브랜드팀':4,'마케팅팀':4,'커머스팀':1,'Biz팀':1,'디자인팀':1}; // 팀별 필요인턴수 기본값
+let teamNeeds={...DEFAULT_TEAM_NEEDS}; // 실제 사용 값 (수정 가능, Gist에 저장/동기화됨)
 const TC={'마케팅팀':{dark:'#4F46B8',light:'#EEEDFE',mid:'#AFA9EC',r:79,g:70,b:184},'브랜드팀':{dark:'#0C6B51',light:'#E1F5EE',mid:'#5CC8A0',r:12,g:107,b:81},'디자인팀':{dark:'#8F570A',light:'#FFF3E0',mid:'#EDA827',r:143,g:87,b:10},'커머스팀':{dark:'#155FA3',light:'#E6F1FB',mid:'#82B5E9',r:21,g:95,b:163},'Biz팀':{dark:'#852343',light:'#FBEAF0',mid:'#E48BAF',r:133,g:35,b:67}};
 const HOLIDAYS=new Set(['2025-05-01','2025-05-05','2025-05-06','2025-06-06','2025-08-15','2025-10-03','2025-10-06','2025-10-07','2025-10-08','2025-10-09','2025-12-25']);
 const STATUS_CYCLE=['','O','X','△','연','재'];
@@ -643,6 +662,7 @@ const DEFAULT_INTERNS=[
 let cfg=null,interns=[],periods=[],attData={},nextId=19;
 let editingId=null,pendingDelId=null,pfEditing=null,pfColorIdx=0;
 let deletedIds=new Set(); // ⑧ Fix: 삭제된 인턴 ID를 기억해 병합 시 되살아나지 않도록 함
+let teamNeedsDirty=false; // 이번 세션에서 필요인원을 직접 수정했는지 여부 (병합 시 덮어쓰기 방지)
 let curMonth=6,curYear=2025,attTeam='all',ganttFilter='all',syncTimer=null;
 
 // ══ UTILS ════════════════════════════════════════════
@@ -697,9 +717,9 @@ async function doSetup(){
   const btn=document.getElementById('btn-setup');btn.disabled=true;btn.textContent='연결 확인 중...';
   try{
     const hash=await sha256(pw);cfg={token,gistId,passwordHash:hash};
-    await gistPut({passwordHash:hash,interns:DEFAULT_INTERNS,periods:DEFAULT_PERIODS,attendance:{},nextId:19});
+    await gistPut({passwordHash:hash,interns:DEFAULT_INTERNS,periods:DEFAULT_PERIODS,attendance:{},nextId:19,teamNeeds:DEFAULT_TEAM_NEEDS});
     localStorage.setItem('vb_gh_cfg',JSON.stringify({token,gistId,passwordHash:hash}));
-    interns=[...DEFAULT_INTERNS];periods=[...DEFAULT_PERIODS];attData={};nextId=19;
+    interns=[...DEFAULT_INTERNS];periods=[...DEFAULT_PERIODS];attData={};nextId=19;teamNeeds={...DEFAULT_TEAM_NEEDS};
     toast('GitHub Gist 연결 완료!');document.getElementById('screen-setup').style.display='none';launchApp();
   }catch(e){errEl.textContent='연결 실패: '+e.message;errEl.style.display='block';cfg=null;}
   finally{btn.disabled=false;btn.textContent='설정 완료 및 시작';}
@@ -732,7 +752,8 @@ async function doLogin(){
       periods=data.periods||DEFAULT_PERIODS;
       attData=data.attendance||{};
       nextId=data.nextId||19;
-    }else{interns=[...DEFAULT_INTERNS];periods=[...DEFAULT_PERIODS];attData={};nextId=19;}
+      teamNeeds=data.teamNeeds||{...DEFAULT_TEAM_NEEDS};
+    }else{interns=[...DEFAULT_INTERNS];periods=[...DEFAULT_PERIODS];attData={};nextId=19;teamNeeds={...DEFAULT_TEAM_NEEDS};}
     hideLoading();launchApp();
   }catch(e){errEl.textContent='GitHub 연결 실패: '+e.message;errEl.style.display='block';hideLoading();document.getElementById('screen-login').style.display='flex';}
   finally{btn.disabled=false;btn.textContent='로그인';}
@@ -768,6 +789,8 @@ async function syncNow(){
         // 원격에만 있는 근무현황 키 병합 (로컬 우선)
         const remoteAtt=remote.attendance||{};
         Object.entries(remoteAtt).forEach(([k,v])=>{if(attData[k]===undefined)attData[k]=v;});
+        // 필요인원 설정 병합: 이번 세션에서 로컬 수정이 없었다면 원격 값 채택
+        if(remote.teamNeeds&&!teamNeedsDirty) teamNeeds=remote.teamNeeds;
         // Gist 비밀번호 해시 최신화
         if(remote.passwordHash&&remote.passwordHash!==cfg.passwordHash){
           cfg.passwordHash=remote.passwordHash;
@@ -778,7 +801,7 @@ async function syncNow(){
       }
     }catch(mergeErr){console.warn('병합 중 오류(무시):', mergeErr);}
 
-    await gistPut({passwordHash:cfg.passwordHash,interns,periods,attendance:attData,nextId});
+    await gistPut({passwordHash:cfg.passwordHash,interns,periods,attendance:attData,nextId,teamNeeds});
     setSB('saved','✓ 저장됨');
     lastSyncTime=Date.now();
     setTimeout(()=>setSB('','↻ 새로고침'),3000);
@@ -819,6 +842,7 @@ async function refreshData(){
       periods=data.periods||DEFAULT_PERIODS;
       attData=data.attendance||{};
       nextId=data.nextId||19;
+      teamNeeds=data.teamNeeds||{...DEFAULT_TEAM_NEEDS};
       renderAll();
       if(document.getElementById('tab-attendance').classList.contains('active'))renderAtt();
       if(document.getElementById('tab-settings').classList.contains('active'))renderPeriods();
@@ -849,7 +873,7 @@ window.addEventListener('beforeunload',()=>{
   if(cfg&&syncTimer){
     clearTimeout(syncTimer);
     // 동기식 저장 시도 (beacon API 사용)
-    const payload=JSON.stringify({passwordHash:cfg.passwordHash,interns,periods,attendance:attData,nextId});
+    const payload=JSON.stringify({passwordHash:cfg.passwordHash,interns,periods,attendance:attData,nextId,teamNeeds});
     const blob=new Blob([JSON.stringify({files:{[GIST_FILE]:{content:payload}}})],{type:'application/json'});
     navigator.sendBeacon&&navigator.sendBeacon(
       `https://api.github.com/gists/${cfg.gistId}`,blob
@@ -885,6 +909,24 @@ function renderSidebar(){
   document.getElementById('topbar-count').textContent=`총 ${interns.length}명`;
 }
 function toggleMajorNA(){const chk=document.getElementById('f-major-na'),inp=document.getElementById('f-major');if(chk.checked){inp.value='해당사항없음';inp.disabled=true;}else{inp.disabled=false;if(inp.value==='해당사항없음')inp.value='';inp.focus();}}
+// ══ TEAM NEEDS EDIT (필요인원 수정) ══════════════════════
+function openTeamNeedsForm(){
+  const grid=document.getElementById('tn-form-grid');
+  grid.innerHTML=TEAMS.map(t=>{const c=TC[t],v=teamNeeds[t]!==undefined?teamNeeds[t]:0;return `<div class="tn-form-item"><label><span style="width:8px;height:8px;border-radius:50%;background:${c.dark};display:inline-block;flex-shrink:0"></span>${t}</label><input type="number" min="0" step="1" id="tn-inp-${t}" value="${v}"></div>`;}).join('');
+  document.getElementById('team-needs-form').style.display='block';
+}
+function closeTeamNeedsForm(){document.getElementById('team-needs-form').style.display='none';}
+function saveTeamNeeds(){
+  const next={};
+  TEAMS.forEach(t=>{const el=document.getElementById(`tn-inp-${t}`);const n=parseInt(el.value,10);next[t]=isNaN(n)||n<0?0:n;});
+  teamNeeds=next;
+  teamNeedsDirty=true;
+  closeTeamNeedsForm();
+  renderDashboard();
+  toast('팀별 필요인원이 수정되었습니다');
+  syncNow().catch(()=>{});
+}
+
 function jumpToTeam(t){goTab('attendance',document.querySelector('.nav-item:nth-child(3)'));attTeam=t;renderAttTF();renderAtt();}
 
 // ══ DASHBOARD ════════════════════════════════════════
@@ -895,8 +937,8 @@ function renderDashboard(){
 
   // 이번 달 충원율 계산 (필요인원 설정된 팀 기준)
   const now=new Date(),curY=now.getFullYear(),curM=now.getMonth();
-  const needTeams=Object.keys(TEAM_NEEDS);
-  const totalNeed=needTeams.reduce((s,t)=>s+TEAM_NEEDS[t],0);
+  const needTeams=Object.keys(teamNeeds);
+  const totalNeed=needTeams.reduce((s,t)=>s+teamNeeds[t],0);
   const totalActualNow=needTeams.reduce((s,t)=>s+interns.filter(i=>i.team===t&&isActiveInMonth(i,curY,curM)).length,0);
   const fillRate=totalNeed>0?Math.round(totalActualNow/totalNeed*100):0;
   const fillColor=fillRate<100?'#B4232E':fillRate===100?'#0C6B51':'#8F570A';
@@ -959,7 +1001,7 @@ function renderHeatmap(){
 // ══ STAFFING (필요인원 대비 충원현황) ═══════════════════
 function renderStaffing(){
   const months=getTimelineMonths();
-  const teams=Object.keys(TEAM_NEEDS);
+  const teams=Object.keys(teamNeeds);
   const shortages=[]; // {team,year,month,diff}
 
   let h='<thead><tr><th class="staff-head-team">팀 (필요인원)</th>';
@@ -967,7 +1009,7 @@ function renderStaffing(){
   h+='</tr></thead><tbody>';
 
   teams.forEach(team=>{
-    const need=TEAM_NEEDS[team],c=TC[team];
+    const need=teamNeeds[team],c=TC[team];
     h+=`<tr><td class="staff-team-label"><div class="staff-team-name"><span style="width:8px;height:8px;border-radius:50%;background:${c?c.dark:'#888'};flex-shrink:0;display:inline-block"></span>${team} <span class="staff-team-need">(필요 ${need}명)</span></div></td>`;
     months.forEach(({year,month})=>{
       const actual=interns.filter(i=>i.team===team&&isActiveInMonth(i,year,month)).length;
