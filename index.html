@@ -687,12 +687,13 @@ async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEn
 
 // ══ TIMELINE MONTHS ══════════════════════════════════
 function getTimelineMonths(){
-  let y0=2025,m0=4,y1=2025,m1=11; // default May-Dec 2025
+  let y0=2026,m0=4,y1=2026,m1=11; // default May-Dec 2026
   interns.forEach(i=>{
     const s=new Date(i.start),e=new Date(i.end);
     if(s.getFullYear()<y0||(s.getFullYear()===y0&&s.getMonth()<m0)){y0=s.getFullYear();m0=s.getMonth();}
     if(e.getFullYear()>y1||(e.getFullYear()===y1&&e.getMonth()>m1)){y1=e.getFullYear();m1=e.getMonth();}
   });
+  if(y0<2026||(y0===2026&&m0<4)){y0=2026;m0=4;} // 2026년 5월 이전은 표시하지 않음
   const months=[];let y=y0,m=m0;
   while(y<y1||(y===y1&&m<=m1)){months.push({year:y,month:m});m++;if(m>11){m=0;y++;}}
   return months;
