@@ -141,6 +141,17 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;font
 
 /* ═══ STAFFING (필요인원 대비 충원현황) ═══════════════ */
 .staff-wrap{background:var(--card);border-radius:12px;box-shadow:var(--sh);border:1px solid var(--border2);overflow:hidden;margin-bottom:16px;}
+.office-week-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.ow-col label{display:block;font-size:10.5px;color:var(--t3);text-align:center;margin-bottom:4px;font-weight:500;}
+.ow-select{width:100%;font-size:11px;padding:6px 2px;text-align:center;text-align-last:center;}
+.office-wrap{background:var(--card);border-radius:12px;box-shadow:var(--sh);border:1px solid var(--border2);overflow:hidden;margin-bottom:16px;}
+.office-scroll{overflow-x:auto;}
+.office-table{width:100%;border-collapse:collapse;font-size:11.5px;min-width:480px;}
+.office-table th,.office-table td{padding:9px 10px;text-align:center;border-bottom:1px solid var(--border2);}
+.office-table th{font-size:10.5px;color:var(--t3);font-weight:600;background:#FAFAF8;}
+.office-table td:first-child,.office-table th:first-child{text-align:left;font-weight:600;color:var(--t2);position:sticky;left:0;background:var(--card);}
+.office-count{font-family:'DM Mono',monospace;font-size:13px;font-weight:600;}
+.office-summary{padding:10px 16px;font-size:11px;color:var(--t3);border-bottom:1px solid var(--border2);background:#FAFAF8;}
 .btn-edit-needs{font-size:10.5px;font-weight:500;color:var(--t3);background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:4px 9px;cursor:pointer;transition:background .15s;}
 .btn-edit-needs:hover{background:#F0EEE9;}
 .team-needs-form{background:#FAFAF8;border:1px solid var(--border2);border-radius:12px;padding:14px 16px;margin-bottom:12px;}
@@ -482,6 +493,17 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
           </div>
         </div>
 
+        <!-- 1.7 근무사무실 · 요일별 인원 현황 -->
+        <div class="sec-head">
+          <div class="sec-title">📍 근무사무실 · 요일별 인원 현황</div>
+          <div style="font-size:10px;color:var(--t4)">현재 진행중인 인턴 기준</div>
+        </div>
+        <div class="office-wrap">
+          <div class="office-summary" id="office-summary"></div>
+          <div class="office-scroll"><table class="office-table" id="office-table"></table></div>
+        </div>
+
+
 
         <!-- 2. 인턴 참여기간 타임라인 (간트) -->
         <div class="sec-head">
@@ -610,6 +632,16 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
       </div>
     </div>
     <div class="form-section">
+      <div class="form-section-title">요일별 근무사무실</div>
+      <div class="office-week-row">
+        <div class="ow-col"><label>월</label><select class="form-select ow-select" id="f-office-mon"><option value="">-</option><option>여의도</option><option>충무로</option><option>재택</option></select></div>
+        <div class="ow-col"><label>화</label><select class="form-select ow-select" id="f-office-tue"><option value="">-</option><option>여의도</option><option>충무로</option><option>재택</option></select></div>
+        <div class="ow-col"><label>수</label><select class="form-select ow-select" id="f-office-wed"><option value="">-</option><option>여의도</option><option>충무로</option><option>재택</option></select></div>
+        <div class="ow-col"><label>목</label><select class="form-select ow-select" id="f-office-thu"><option value="">-</option><option>여의도</option><option>충무로</option><option>재택</option></select></div>
+        <div class="ow-col"><label>금</label><select class="form-select ow-select" id="f-office-fri"><option value="">-</option><option>여의도</option><option>충무로</option><option>재택</option></select></div>
+      </div>
+    </div>
+    <div class="form-section">
       <div class="form-section-title">비고</div>
       <div class="form-group"><textarea class="form-textarea" id="f-note" placeholder="특이사항, 메모 등"></textarea></div>
     </div>
@@ -629,6 +661,10 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
 <script>
 // ══ CONSTANTS ════════════════════════════════════════
 const TEAMS=['마케팅팀','브랜드팀','디자인팀','커머스팀','Biz팀'];
+const WEEKDAYS=['mon','tue','wed','thu','fri'];
+const WD_LABEL={mon:'월',tue:'화',wed:'수',thu:'목',fri:'금'};
+const OFFICES=['여의도','충무로','재택'];
+const OC={'여의도':{dark:'#155FA3',light:'#E6F1FB'},'충무로':{dark:'#8F570A',light:'#FFF3E0'},'재택':{dark:'#5A5A62',light:'#EBEBEB'}};
 const DEFAULT_TEAM_NEEDS={'브랜드팀':4,'마케팅팀':4,'커머스팀':1,'Biz팀':1,'디자인팀':1}; // 팀별 필요인턴수 기본값
 let teamNeeds={...DEFAULT_TEAM_NEEDS}; // 실제 사용 값 (수정 가능, Gist에 저장/동기화됨)
 const TC={'마케팅팀':{dark:'#4F46B8',light:'#EEEDFE',mid:'#AFA9EC',r:79,g:70,b:184},'브랜드팀':{dark:'#0C6B51',light:'#E1F5EE',mid:'#5CC8A0',r:12,g:107,b:81},'디자인팀':{dark:'#8F570A',light:'#FFF3E0',mid:'#EDA827',r:143,g:87,b:10},'커머스팀':{dark:'#155FA3',light:'#E6F1FB',mid:'#82B5E9',r:21,g:95,b:163},'Biz팀':{dark:'#852343',light:'#FBEAF0',mid:'#E48BAF',r:133,g:35,b:67}};
@@ -958,6 +994,7 @@ function renderDashboard(){
 
   renderHeatmap();
   renderStaffing();
+  renderOfficeMatrix();
   renderGantt();
 
   const mx=Math.max(1,...TEAMS.map(t=>interns.filter(i=>i.team===t).length));
@@ -1003,6 +1040,33 @@ function renderHeatmap(){
 }
 
 // ══ STAFFING (필요인원 대비 충원현황) ═══════════════════
+function renderOfficeMatrix(){
+  const active=interns.filter(i=>getStatus(i.start,i.end).label==='진행중');
+  const unset=[]; // 요일별 사무실 미지정 인원 카운트용
+  let h='<thead><tr><th>사무실</th>';
+  WEEKDAYS.forEach(d=>h+=`<th>${WD_LABEL[d]}</th>`);
+  h+='<th>합계</th></tr></thead><tbody>';
+  const totals={mon:0,tue:0,wed:0,thu:0,fri:0};
+  OFFICES.forEach(office=>{
+    const c=OC[office];
+    h+=`<tr><td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${c.dark};display:inline-block"></span>${office}</span></td>`;
+    let rowSum=0;
+    WEEKDAYS.forEach(d=>{
+      const names=active.filter(i=>(i.office&&i.office[d])===office).map(i=>i.name);
+      const n=names.length;rowSum+=n;totals[d]+=n;
+      h+=`<td title="${office} ${WD_LABEL[d]}요일: ${n>0?names.join(', '):'없음'}"><span class="office-count" style="color:${n>0?c.dark:'var(--t4)'}">${n}</span></td>`;
+    });
+    h+=`<td><span class="office-count" style="color:${c.dark}">${rowSum}</span></td></tr>`;
+  });
+  h+=`<tr style="background:#FAFAF8"><td style="font-weight:600;color:var(--t3)">합계</td>`;
+  WEEKDAYS.forEach(d=>h+=`<td><span class="office-count">${totals[d]}</span></td>`);
+  h+=`<td><span class="office-count">${active.length}</span></td></tr>`;
+  h+='</tbody>';
+  document.getElementById('office-table').innerHTML=h;
+  WEEKDAYS.forEach(d=>{const n=active.filter(i=>!i.office||!i.office[d]).length;if(n>0)unset.push(`${WD_LABEL[d]}요일 ${n}명`);});
+  document.getElementById('office-summary').innerHTML=unset.length?`⚠️ 근무사무실 미지정: ${unset.join(' · ')}`:`✅ 진행중인 인턴 ${active.length}명 모두 요일별 근무사무실이 지정되어 있습니다`;
+}
+
 function renderStaffing(){
   const months=getTimelineMonths();
   const teams=Object.keys(teamNeeds);
@@ -1142,14 +1206,15 @@ function renderRoster(){
 }
 
 // ══ DRAWER ═══════════════════════════════════════════
-function openDrawer(id=null){editingId=id;document.querySelectorAll('.form-input,.form-select,.form-textarea').forEach(el=>el.classList.remove('err'));populatePeriodSelect();if(id){const i=interns.find(x=>x.id===id);document.getElementById('drawer-title').textContent='인턴 정보 수정';document.getElementById('drawer-sub').textContent=`${i.name}의 정보를 수정합니다`;['name','grade','univ','major','phone','email','role','subrole','team','period','start','end','note','org','worktime'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value=i[k]||'';});const majorNA=i.major==='해당사항없음';document.getElementById('f-major-na').checked=majorNA;document.getElementById('f-major').disabled=majorNA;}else{document.getElementById('drawer-title').textContent='인턴 등록';document.getElementById('drawer-sub').textContent='새 인턴 정보를 입력하세요';['name','univ','major','phone','email','subrole','note','org'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value='';});['grade','role','team','period','worktime'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value='';});document.getElementById('f-major-na').checked=false;document.getElementById('f-major').disabled=false;document.getElementById('f-start').value='2025-07-01';document.getElementById('f-end').value='2025-08-31';}updateTPreview();document.getElementById('overlay').classList.add('show');document.getElementById('drawer').classList.add('open');}
+function openDrawer(id=null){editingId=id;document.querySelectorAll('.form-input,.form-select,.form-textarea').forEach(el=>el.classList.remove('err'));populatePeriodSelect();if(id){const i=interns.find(x=>x.id===id);document.getElementById('drawer-title').textContent='인턴 정보 수정';document.getElementById('drawer-sub').textContent=`${i.name}의 정보를 수정합니다`;['name','grade','univ','major','phone','email','role','subrole','team','period','start','end','note','org','worktime'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value=i[k]||'';});const majorNA=i.major==='해당사항없음';document.getElementById('f-major-na').checked=majorNA;document.getElementById('f-major').disabled=majorNA;WEEKDAYS.forEach(d=>{document.getElementById('f-office-'+d).value=(i.office&&i.office[d])||'';});}else{document.getElementById('drawer-title').textContent='인턴 등록';document.getElementById('drawer-sub').textContent='새 인턴 정보를 입력하세요';['name','univ','major','phone','email','subrole','note','org'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value='';});['grade','role','team','period','worktime'].forEach(k=>{const el=document.getElementById('f-'+k);if(el)el.value='';});WEEKDAYS.forEach(d=>{document.getElementById('f-office-'+d).value='';});document.getElementById('f-major-na').checked=false;document.getElementById('f-major').disabled=false;document.getElementById('f-start').value='2025-07-01';document.getElementById('f-end').value='2025-08-31';}updateTPreview();document.getElementById('overlay').classList.add('show');document.getElementById('drawer').classList.add('open');}
 function closeDrawer(){document.getElementById('overlay').classList.remove('show');document.getElementById('drawer').classList.remove('open');editingId=null;}
 function updateTPreview(){const t=document.getElementById('f-team').value,dot=document.getElementById('tp-dot'),name=document.getElementById('tp-name'),prev=document.getElementById('team-preview');if(t&&TC[t]){dot.style.background=TC[t].dark;name.textContent=t;name.style.color=TC[t].dark;prev.style.background=TC[t].light;prev.style.borderColor=TC[t].mid;}else{dot.style.background='transparent';name.textContent='팀을 선택하세요';name.style.color='var(--t4)';prev.style.background='var(--bg)';prev.style.borderColor='var(--border2)';}}
 function saveIntern(){
   const req=['f-name','f-grade','f-univ','f-major','f-role','f-team','f-period','f-start','f-end'];
   let ok=true;req.forEach(id=>{const el=document.getElementById(id);el.classList.remove('err');if(!el.value.trim()){el.classList.add('err');ok=false;}});
   if(!ok){toast('필수 항목을 모두 입력해주세요','err');return;}
-  const data={name:document.getElementById('f-name').value.trim(),grade:document.getElementById('f-grade').value,univ:document.getElementById('f-univ').value.trim(),major:document.getElementById('f-major').value.trim(),phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),role:document.getElementById('f-role').value,subrole:document.getElementById('f-subrole').value.trim(),org:document.getElementById('f-org').value.trim(),worktime:document.getElementById('f-worktime').value,team:document.getElementById('f-team').value,period:document.getElementById('f-period').value,start:document.getElementById('f-start').value,end:document.getElementById('f-end').value,note:document.getElementById('f-note').value.trim()};
+  const office={};WEEKDAYS.forEach(d=>{office[d]=document.getElementById('f-office-'+d).value;});
+  const data={name:document.getElementById('f-name').value.trim(),grade:document.getElementById('f-grade').value,univ:document.getElementById('f-univ').value.trim(),major:document.getElementById('f-major').value.trim(),phone:document.getElementById('f-phone').value.trim(),email:document.getElementById('f-email').value.trim(),role:document.getElementById('f-role').value,subrole:document.getElementById('f-subrole').value.trim(),org:document.getElementById('f-org').value.trim(),worktime:document.getElementById('f-worktime').value,team:document.getElementById('f-team').value,period:document.getElementById('f-period').value,start:document.getElementById('f-start').value,end:document.getElementById('f-end').value,note:document.getElementById('f-note').value.trim(),office};
   if(editingId){const idx=interns.findIndex(i=>i.id===editingId);interns[idx]={...interns[idx],...data};toast(`${data.name} 정보가 수정되었습니다`);}
   else{interns.push({id:nextId++,...data});toast(`${data.name}이(가) 등록되었습니다`);}
   closeDrawer();renderAll();
