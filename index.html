@@ -93,6 +93,8 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;font
 .gh-chip{font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid #30363D;color:#8B949E;background:#161B22;font-family:'DM Mono',monospace;}
 .btn-primary{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--t1);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:500;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:opacity .15s;}
 .btn-primary:hover{opacity:.85;}
+.btn-danger-line{display:flex;align-items:center;gap:6px;padding:7px 14px;background:#fff;color:var(--c-err);border:1px solid #E5C2C2;border-radius:8px;font-size:12px;font-weight:500;font-family:'Noto Sans KR',sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-danger-line:hover{background:#FDF5F5;border-color:var(--c-err);}
 .btn-ghost{padding:7px 12px;background:transparent;color:var(--t2);border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;}
 
 .content{flex:1;overflow-y:auto;padding:20px 22px;}
@@ -141,6 +143,33 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;font
 
 /* ═══ STAFFING (필요인원 대비 충원현황) ═══════════════ */
 .staff-wrap{background:var(--card);border-radius:12px;box-shadow:var(--sh);border:1px solid var(--border2);overflow:hidden;margin-bottom:16px;}
+.staff-summary{padding:14px 18px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:14px;background:#FFFBF5;color:#8F570A;}
+.staff-summary.ok{background:#F2FAF6;color:#0C6B51;}
+.staff-summary .ss-icon{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.staff-summary .ss-body{flex:1;min-width:0;}
+.staff-summary .ss-title{font-size:13px;font-weight:600;line-height:1.4;}
+.staff-summary .ss-sub{font-size:11px;opacity:.75;margin-top:3px;}
+.staff-summary .ss-rate{font-family:'DM Mono',monospace;font-size:22px;font-weight:700;line-height:1;flex-shrink:0;}
+.staff-summary .ss-rate span{font-size:12px;}
+.tpc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;padding:14px;}
+.tpc{background:#FFF;border:1px solid var(--border);border-radius:12px;padding:12px 10px 10px;text-align:center;transition:border-color .15s,box-shadow .15s;}
+.tpc:hover{border-color:var(--border-strong,var(--t4));box-shadow:0 2px 6px rgba(0,0,0,.04);}
+.tpc-header{display:flex;align-items:center;justify-content:center;gap:5px;margin-bottom:10px;}
+.tpc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.tpc-name{font-size:11.5px;font-weight:600;color:var(--t1);}
+.tpc-ring-wrap{position:relative;width:64px;height:64px;margin:0 auto 9px;}
+.tpc-fraction{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:'DM Mono',monospace;color:var(--t1);}
+.tpc-status{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;padding:3px 8px;border-radius:20px;font-weight:600;line-height:1;}
+.tpc-status.short{background:#FCEAEA;color:#A32D2D;}
+.tpc-status.ok{background:#E1F5EE;color:#0C6B51;}
+.tpc-status.over{background:#FFF3E0;color:#8F570A;}
+.tpc-future{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:9px;padding-top:8px;border-top:1px solid var(--border2);}
+.tpc-future-label{font-size:9px;color:var(--t3);letter-spacing:.2px;}
+.tpc-future-bars{display:flex;gap:2px;}
+.tpc-future-bar{width:16px;height:5px;border-radius:2px;background:#F1EFE8;}
+.tpc-future-bar.short{background:#F5B8B8;}
+.tpc-future-bar.ok{background:#7BC7A5;}
+.tpc-future-bar.over{background:#F0BE6F;}
 .office-week-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
 .ow-col label{display:block;font-size:10.5px;color:var(--t3);text-align:center;margin-bottom:4px;font-weight:500;}
 .ow-select{width:100%;font-size:11px;padding:6px 2px;text-align:center;text-align-last:center;}
@@ -164,34 +193,6 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;font
 .staff-summary{padding:10px 16px;border-bottom:1px solid var(--border2);font-size:11.5px;line-height:1.6;background:#FFFBF5;color:#8F570A;}
 .staff-summary.ok{background:#F2FAF6;color:#0C6B51;}
 .staff-summary b{font-weight:700;}
-.staff-scroll{overflow-x:auto;}
-.staff-scroll::-webkit-scrollbar{height:4px;}
-.staff-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-.staff-table{border-collapse:collapse;width:100%;min-width:700px;}
-.staff-table th,.staff-table td{border:1px solid var(--border2);}
-.staff-head-team{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.4px;text-transform:uppercase;padding:9px 14px;background:#FAFAF8;white-space:nowrap;min-width:110px;}
-.staff-head-month{font-size:11px;font-weight:600;text-align:center;padding:7px 8px;background:#FAFAF8;white-space:nowrap;min-width:64px;}
-.staff-head-month .mo-name{color:var(--t1);}
-.staff-head-month .mo-year{font-size:9px;color:var(--t4);display:block;}
-.staff-team-label{padding:10px 14px;white-space:nowrap;}
-.staff-team-name{font-size:12px;font-weight:500;display:flex;align-items:center;gap:7px;}
-.staff-team-need{font-size:10px;color:var(--t4);font-weight:400;}
-.staff-cell{text-align:center;padding:8px 4px;cursor:default;transition:filter .15s;}
-.staff-cell:hover{filter:brightness(.95);}
-.staff-cell.short{background:#FCEAEA;}
-.staff-cell.ok{background:#E1F5EE;}
-.staff-cell.over{background:#FFF3E0;}
-.staff-count{font-size:13px;font-weight:700;font-family:'DM Mono',monospace;line-height:1;}
-.staff-cell.short .staff-count{color:#B4232E;}
-.staff-cell.ok .staff-count{color:#0C6B51;}
-.staff-cell.over .staff-count{color:#8F570A;}
-.staff-diff{font-size:9px;margin-top:2px;font-weight:600;}
-.staff-cell.short .staff-diff{color:#B4232E;}
-.staff-cell.ok .staff-diff{color:#0C6B51;opacity:.7;}
-.staff-cell.over .staff-diff{color:#8F570A;}
-.staff-legend{display:flex;align-items:center;gap:16px;padding:10px 16px;border-top:1px solid var(--border2);background:#FAFAF8;flex-wrap:wrap;}
-.staff-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t2);}
-.staff-leg-dot{width:10px;height:10px;border-radius:3px;display:inline-block;}
 .hm-leg-dot{width:12px;height:12px;border-radius:3px;}
 
 /* ═══ GANTT ═════════════════════════════════════════ */
@@ -224,14 +225,16 @@ html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR',sans-serif;font
 .gantt-empty{padding:16px 14px;font-size:11px;color:var(--t4);}
 
 /* BOTTOM CHARTS */
-.bottom-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.bottom-row{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:16px;}
 .card{background:var(--card);border-radius:12px;padding:16px 18px;box-shadow:var(--sh);border:1px solid var(--border2);}
 .card-title{font-size:12px;font-weight:600;margin-bottom:11px;}
 .team-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
-.team-bar-label{font-size:11px;color:var(--t2);width:64px;}
+.team-bar-label{font-size:11px;color:var(--t2);width:100px;flex-shrink:0;}
 .team-bar-bg{flex:1;height:7px;background:var(--bg);border-radius:4px;overflow:hidden;}
 .team-bar-fill{height:100%;border-radius:4px;}
 .team-bar-n{font-family:'DM Mono',monospace;font-size:11px;color:var(--t3);width:18px;text-align:right;}
+.team-bar-wt{font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);white-space:nowrap;display:flex;gap:3px;align-items:center;min-width:66px;justify-content:flex-end;}
+.team-bar-wt .sep{color:var(--t4);}
 .period-row{display:flex;align-items:center;justify-content:space-between;padding:7px 11px;border-radius:8px;background:var(--bg);margin-bottom:5px;}
 .period-row:last-child{margin-bottom:0;}
 
@@ -485,12 +488,7 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
         </div>
         <div class="staff-wrap">
           <div class="staff-summary" id="staff-summary"></div>
-          <div class="staff-scroll"><table class="staff-table" id="staff-table"></table></div>
-          <div class="staff-legend">
-            <span class="staff-leg-item"><span class="staff-leg-dot" style="background:#FCEAEA;border:1px solid #F0C8C8"></span>부족</span>
-            <span class="staff-leg-item"><span class="staff-leg-dot" style="background:#E1F5EE;border:1px solid #C3E9DA"></span>충족</span>
-            <span class="staff-leg-item"><span class="staff-leg-dot" style="background:#FFF3E0;border:1px solid #F2DDB0"></span>과다</span>
-          </div>
+          <div class="tpc-grid" id="tpc-grid"></div>
         </div>
 
         <!-- 1.7 근무사무실 · 요일별 인원 현황 -->
@@ -508,7 +506,13 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
         <!-- 2. 인턴 참여기간 타임라인 (간트) -->
         <div class="sec-head">
           <div class="sec-title">📅 인턴 참여기간 타임라인</div>
-          <div style="display:flex;align-items:center;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);">
+              <span style="width:14px;height:8px;background:#5C6B82;border-radius:2px;display:inline-block"></span>5시간
+            </span>
+            <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);">
+              <span style="width:14px;height:8px;background:#5C6B82;background-image:repeating-linear-gradient(45deg,transparent 0,transparent 3px,rgba(255,255,255,.35) 3px,rgba(255,255,255,.35) 6px);border-radius:2px;display:inline-block"></span>8시간
+            </span>
             <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:#E05252;"><span style="width:10px;height:2px;background:#E05252;display:inline-block;border-radius:1px"></span>오늘</span>
             <div class="view-toggle">
               <button class="vt-btn active" id="vt-all" onclick="setGanttFilter('all',this)">전체</button>
@@ -521,10 +525,9 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
           <div class="gantt-scroll"><div class="gantt-inner" id="gantt-inner"></div></div>
         </div>
 
-        <!-- 3. 팀별 인원 + 기간 구성 -->
+        <!-- 3. 팀별 인원 -->
         <div class="bottom-row">
           <div class="card"><div class="card-title">팀별 인원</div><div id="dash-teams"></div></div>
-          <div class="card"><div class="card-title">참여기간 구성</div><div id="dash-periods"></div></div>
         </div>
       </div>
 
@@ -536,9 +539,10 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
           <select class="sel" id="q-role" onchange="renderRoster()"><option value="">전체 직무</option><option>마케팅/홍보</option><option>MD</option><option>경영/총무/인사</option><option>디자인</option></select>
           <select class="sel" id="q-period" onchange="renderRoster()"><option value="">전체 기간</option></select>
           <select class="sel" id="q-status" onchange="renderRoster()"><option value="">전체 상태</option><option value="진행중">진행중</option><option value="예정">예정</option><option value="완료">완료</option></select>
+          <select class="sel" id="q-worktime" onchange="renderRoster()"><option value="">전체 근무시간</option><option value="5시간">5시간</option><option value="8시간">8시간</option><option value="__none__">미설정</option></select>
           <span class="fc" id="fc"></span>
         </div>
-        <div class="table-wrap"><table><thead><tr><th>#</th><th>이름</th><th>팀</th><th>직무</th><th>학년</th><th>전공</th><th>운영기관</th><th>참여기간</th><th>인턴기간</th><th>상태</th><th>관리</th></tr></thead><tbody id="roster-body"></tbody></table></div>
+        <div class="table-wrap"><table><thead><tr><th>#</th><th>이름</th><th>팀</th><th>직무</th><th>학년</th><th>전공</th><th>운영기관</th><th>참여기간</th><th>인턴기간</th><th>상태</th><th>연락처</th><th>이메일</th><th>관리</th></tr></thead><tbody id="roster-body"></tbody></table></div>
       </div>
 
       <!-- ══ ATTENDANCE ══════════════════════════════ -->
@@ -577,6 +581,16 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
             </div>
             <div class="period-list" id="period-list-ui"></div>
           </div>
+
+          <div class="settings-card">
+            <div class="settings-head">
+              <div>
+                <div class="settings-title">인턴 명단 재설정</div>
+                <div class="settings-sub">현재 명단을 초기 시드 명단(18명)으로 되돌립니다. 참여기간·팀별 필요인원·근무현황은 유지됩니다.</div>
+              </div>
+              <button class="btn-danger-line" onclick="openResetInternsConfirm()">↺ 명단 재설정</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -599,7 +613,7 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
         <div class="form-group"><label class="form-label">학년<span class="req">*</span></label><select class="form-select" id="f-grade"><option value="">선택</option><option>1학년</option><option>2학년</option><option>3학년</option><option>4학년</option><option>대학원생</option><option>졸업예정</option><option>해당사항없음</option></select></div>
       </div>
       <div class="form-row c2">
-        <div class="form-group"><label class="form-label">대학교<span class="req">*</span></label><input class="form-input" id="f-univ" placeholder="○○대학교"></div>
+        <div class="form-group"><label class="form-label">대학교</label><input class="form-input" id="f-univ" placeholder="○○대학교"></div>
         <div class="form-group"><div style="display:flex;align-items:center;justify-content:space-between"><label class="form-label" style="margin-bottom:0">전공<span class="req">*</span></label><label style="font-weight:400;font-size:11px;color:var(--t3);display:inline-flex;align-items:center;gap:4px;cursor:pointer;margin-bottom:6px"><input type="checkbox" id="f-major-na" onchange="toggleMajorNA()" style="cursor:pointer">해당없음</label></div><input class="form-input" id="f-major" placeholder="경영학과"></div>
       </div>
       <div class="form-row c2">
@@ -619,7 +633,7 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
       </div>
       <div class="form-group">
         <label class="form-label">팀 배정<span class="req">*</span></label>
-        <select class="form-select" id="f-team" onchange="updateTPreview()"><option value="">팀 선택</option><option>마케팅팀</option><option>브랜드팀</option><option>디자인팀</option><option>커머스팀</option><option>Biz팀</option></select>
+        <select class="form-select" id="f-team" onchange="updateTPreview()"><option value="">팀 선택</option><option>마케팅팀</option><option>브랜드팀</option><option>마케팅팀-디자인</option><option>커머스팀</option><option>Biz팀</option></select>
         <div class="team-preview" id="team-preview"><span class="tp-dot" id="tp-dot"></span><span class="tp-name" id="tp-name" style="color:var(--t4)">팀을 선택하세요</span></div>
       </div>
     </div>
@@ -656,18 +670,31 @@ tbody td{padding:9px 13px;vertical-align:middle;font-size:12px;}
   <div class="del-confirm-sub" id="del-sub"></div>
   <div class="del-confirm-btns"><button class="btn-del-cancel" onclick="closeDelConfirm()">취소</button><button class="btn-del-confirm" onclick="confirmDel()">삭제</button></div>
 </div>
+
+<div class="overlay" id="reset-ov" onclick="closeResetInternsConfirm()" style="z-index:298"></div>
+<div class="del-confirm" id="reset-confirm" style="width:340px">
+  <div class="del-confirm-icon">↺</div>
+  <div class="del-confirm-title">인턴 명단을 재설정할까요?</div>
+  <div class="del-confirm-sub">
+    현재 등록된 <strong id="reset-cur-count">0</strong>명이<br>
+    <strong>초기 시드 명단 18명</strong>으로 대체됩니다.<br><br>
+    참여기간·팀별 필요인원·근무현황 데이터는<br>그대로 유지됩니다.<br><br>
+    <span style="color:var(--c-err);font-weight:600">이 작업은 되돌릴 수 없습니다.</span>
+  </div>
+  <div class="del-confirm-btns"><button class="btn-del-cancel" onclick="closeResetInternsConfirm()">취소</button><button class="btn-del-confirm" onclick="confirmResetInterns()">재설정</button></div>
+</div>
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <script>
 // ══ CONSTANTS ════════════════════════════════════════
-const TEAMS=['마케팅팀','브랜드팀','디자인팀','커머스팀','Biz팀'];
+const TEAMS=['마케팅팀','브랜드팀','마케팅팀-디자인','커머스팀','Biz팀'];
 const WEEKDAYS=['mon','tue','wed','thu','fri'];
 const WD_LABEL={mon:'월',tue:'화',wed:'수',thu:'목',fri:'금'};
 const OFFICES=['여의도','충무로','재택'];
 const OC={'여의도':{dark:'#155FA3',light:'#E6F1FB'},'충무로':{dark:'#8F570A',light:'#FFF3E0'},'재택':{dark:'#5A5A62',light:'#EBEBEB'}};
-const DEFAULT_TEAM_NEEDS={'브랜드팀':4,'마케팅팀':4,'커머스팀':1,'Biz팀':1,'디자인팀':1}; // 팀별 필요인턴수 기본값
+const DEFAULT_TEAM_NEEDS={'브랜드팀':4,'마케팅팀':4,'커머스팀':1,'Biz팀':1,'마케팅팀-디자인':1}; // 팀별 필요인턴수 기본값
 let teamNeeds={...DEFAULT_TEAM_NEEDS}; // 실제 사용 값 (수정 가능, Gist에 저장/동기화됨)
-const TC={'마케팅팀':{dark:'#4F46B8',light:'#EEEDFE',mid:'#AFA9EC',r:79,g:70,b:184},'브랜드팀':{dark:'#0C6B51',light:'#E1F5EE',mid:'#5CC8A0',r:12,g:107,b:81},'디자인팀':{dark:'#8F570A',light:'#FFF3E0',mid:'#EDA827',r:143,g:87,b:10},'커머스팀':{dark:'#155FA3',light:'#E6F1FB',mid:'#82B5E9',r:21,g:95,b:163},'Biz팀':{dark:'#852343',light:'#FBEAF0',mid:'#E48BAF',r:133,g:35,b:67}};
+const TC={'마케팅팀':{dark:'#4F46B8',light:'#EEEDFE',mid:'#AFA9EC',r:79,g:70,b:184},'브랜드팀':{dark:'#0C6B51',light:'#E1F5EE',mid:'#5CC8A0',r:12,g:107,b:81},'마케팅팀-디자인':{dark:'#8F570A',light:'#FFF3E0',mid:'#EDA827',r:143,g:87,b:10},'커머스팀':{dark:'#155FA3',light:'#E6F1FB',mid:'#82B5E9',r:21,g:95,b:163},'Biz팀':{dark:'#852343',light:'#FBEAF0',mid:'#E48BAF',r:133,g:35,b:67}};
 const HOLIDAYS=new Set(['2025-05-01','2025-05-05','2025-05-06','2025-06-06','2025-08-15','2025-10-03','2025-10-06','2025-10-07','2025-10-08','2025-10-09','2025-12-25']);
 const STATUS_CYCLE=['','O','X','△','연','재'];
 const SS={'':  {bg:'transparent',color:'#CCC',sym:''},'O':{bg:'#E1F5EE',color:'#0C6B51',sym:'○'},'X':{bg:'#FCEBEB',color:'#A32D2D',sym:'✕'},'△':{bg:'#FFF3E0',color:'#8F570A',sym:'△'},'연':{bg:'#E6F1FB',color:'#155FA3',sym:'연'},'재':{bg:'#EEEDFE',color:'#4F46B8',sym:'재'},'●':{bg:'#EBEBEB',color:'#606060',sym:'●'}};
@@ -678,24 +705,24 @@ const GIST_FILE='intern-data.json';
 const PERIOD_COLORS=[{bg:'#E6F1FB',fg:'#0C447C',name:'파랑'},{bg:'#FAECE7',fg:'#712B13',name:'주황'},{bg:'#EAF3DE',fg:'#27500A',name:'초록'},{bg:'#EEEDFE',fg:'#3C3489',name:'보라'},{bg:'#FFF3E0',fg:'#854F0B',name:'노랑'},{bg:'#FBEAF0',fg:'#852343',name:'핑크'},{bg:'#EBEBEB',fg:'#3A3A42',name:'회색'}];
 const DEFAULT_PERIODS=[{id:'p1',label:'여름학기 2개월 (7~8월)',colorIdx:0},{id:'p2',label:'여름+가을학기 6개월 (7~12월)',colorIdx:1},{id:'p3',label:'2개월 / 6개월 모두 가능',colorIdx:2}];
 const DEFAULT_INTERNS=[
-  {id:1,name:'박수민',team:'마케팅팀',role:'마케팅/홍보',subrole:'SNS·CRM',grade:'4학년',univ:'',major:'영미문학문화학과',period:'p1',start:'2025-07-01',end:'2025-08-31',phone:'',email:'',note:''},
-  {id:2,name:'박원경',team:'마케팅팀',role:'마케팅/홍보',subrole:'브랜드기획',grade:'4학년',univ:'',major:'프랑스응용어문학과',period:'p3',start:'2025-07-01',end:'2025-12-31',phone:'',email:'',note:''},
-  {id:3,name:'장하윤',team:'마케팅팀',role:'마케팅/홍보',subrole:'캠페인기획',grade:'3학년',univ:'',major:'경영학부',period:'p1',start:'2025-07-01',end:'2025-08-31',phone:'',email:'',note:''},
-  {id:4,name:'노지혜',team:'브랜드팀',role:'마케팅/홍보',subrole:'콘텐츠기획',grade:'4학년',univ:'',major:'아동심리학과',period:'p1',start:'2025-07-01',end:'2025-08-31',phone:'',email:'',note:''},
-  {id:5,name:'이예인',team:'브랜드팀',role:'마케팅/홍보',subrole:'SNS·커뮤니티',grade:'4학년',univ:'',major:'경영학전공',period:'p3',start:'2025-07-01',end:'2025-12-31',phone:'',email:'',note:''},
-  {id:6,name:'김찬영',team:'브랜드팀',role:'마케팅/홍보',subrole:'데이터·CRM',grade:'2학년',univ:'',major:'경영학과',period:'p3',start:'2025-07-01',end:'2025-12-31',phone:'',email:'',note:''},
-  {id:7,name:'오재영',team:'커머스팀',role:'MD',subrole:'상품기획·NPD',grade:'4학년',univ:'',major:'사회학/경영학',period:'p2',start:'2025-07-01',end:'2025-12-31',phone:'',email:'',note:''},
-  {id:8,name:'장유진',team:'커머스팀',role:'경영/총무/인사',subrole:'',grade:'4학년',univ:'',major:'교육학과',period:'p2',start:'2025-07-01',end:'2025-12-31',phone:'',email:'',note:''},
-  {id:9,name:'김윤하',team:'커머스팀',role:'경영/총무/인사',subrole:'',grade:'4학년',univ:'',major:'호텔관광경영학과',period:'p3',start:'2025-07-01',end:'2025-12-31',phone:'',email:'',note:''},
-  {id:10,name:'이유혁',team:'커머스팀',role:'경영/총무/인사',subrole:'',grade:'4학년',univ:'',major:'정치외교학과',period:'p3',start:'2025-07-01',end:'2025-12-31',phone:'',email:'',note:''},
-  {id:11,name:'김지민',team:'Biz팀',role:'경영/총무/인사',subrole:'',grade:'4학년',univ:'',major:'영어영문학전공',period:'p2',start:'2025-07-01',end:'2025-12-31',phone:'',email:'',note:'CX 추천 1순위'},
-  {id:12,name:'박서윤',team:'Biz팀',role:'경영/총무/인사',subrole:'',grade:'4학년',univ:'',major:'산업보안학과',period:'p1',start:'2025-07-01',end:'2025-08-31',phone:'',email:'',note:''},
-  {id:13,name:'곽다현',team:'Biz팀',role:'경영/총무/인사',subrole:'',grade:'4학년',univ:'',major:'관광경영전공',period:'p2',start:'2025-07-01',end:'2025-12-31',phone:'',email:'',note:'CX 추천 2순위'},
-  {id:14,name:'진유하',team:'Biz팀',role:'경영/총무/인사',subrole:'',grade:'3학년',univ:'',major:'컴퓨터공학전공',period:'p3',start:'2025-07-01',end:'2025-12-31',phone:'',email:'',note:''},
-  {id:15,name:'김채연',team:'Biz팀',role:'경영/총무/인사',subrole:'',grade:'3학년',univ:'',major:'스마트경영비서학과',period:'p1',start:'2025-07-01',end:'2025-08-31',phone:'',email:'',note:''},
-  {id:16,name:'김한비',team:'Biz팀',role:'경영/총무/인사',subrole:'',grade:'3학년',univ:'',major:'심리학과',period:'p1',start:'2025-07-01',end:'2025-08-31',phone:'',email:'',note:''},
-  {id:17,name:'박예랑',team:'디자인팀',role:'디자인',subrole:'',grade:'4학년',univ:'',major:'공업디자인학과',period:'p1',start:'2025-07-01',end:'2025-08-31',phone:'',email:'',note:''},
-  {id:18,name:'김희원',team:'디자인팀',role:'디자인',subrole:'',grade:'4학년',univ:'',major:'디지털미디어학과',period:'p1',start:'2025-07-01',end:'2025-08-31',phone:'',email:'',note:''},
+  {id:1,name:'박원경',team:'커머스팀',role:'MD',subrole:'',grade:'4학년',univ:'',major:'프랑스응용어문학과',period:'p2',start:'2026-07-01',end:'2026-12-31',phone:'010-9996-6617',email:'1wongyeong@naver.com',note:'',worktime:''},
+  {id:2,name:'이예인',team:'브랜드팀',role:'마케팅/홍보',subrole:'',grade:'4학년',univ:'',major:'경영학전공',period:'p2',start:'2026-07-01',end:'2026-12-31',phone:'010-2360-8276',email:'2360ss@naver.com',note:'',worktime:''},
+  {id:3,name:'김지민',team:'Biz팀',role:'경영/총무/인사',subrole:'',grade:'4학년',univ:'',major:'영어영문학전공',period:'p2',start:'2026-07-01',end:'2026-12-31',phone:'010-2332-7204',email:'wlals12334@naver.com',note:'CX 추천 1순위',worktime:''},
+  {id:4,name:'나화원',team:'마케팅팀',role:'마케팅/홍보',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-07-01',end:'2026-08-31',phone:'010-9323-3986',email:'ghkdnjs0806@naver.com',note:'',worktime:''},
+  {id:5,name:'김예나래',team:'브랜드팀',role:'마케팅/홍보',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-06-01',end:'2026-08-31',phone:'010-7683-7883',email:'yenaraekim@daum.net',note:'',worktime:''},
+  {id:6,name:'변경혜',team:'마케팅팀',role:'마케팅/홍보',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-06-01',end:'2026-08-31',phone:'010-9559-9956',email:'bkhofficial@gmail.com',note:'',worktime:''},
+  {id:7,name:'이주은',team:'커머스팀',role:'MD',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-05-18',end:'2026-07-24',phone:'010-3014-9220',email:'wndms9220@naver.com',note:'',worktime:''},
+  {id:8,name:'윤수인',team:'브랜드팀',role:'디자인',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-05-18',end:'2026-07-24',phone:'010-9121-9808',email:'Suin9800@naver.com',note:'',worktime:''},
+  {id:9,name:'임경지',team:'브랜드팀',role:'마케팅/홍보',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-06-08',end:'2026-08-28',phone:'010-9552-3358',email:'rudwldla@naver.com',note:'',worktime:''},
+  {id:10,name:'이지원',team:'브랜드팀',role:'마케팅/홍보',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-06-08',end:'2026-08-28',phone:'010-9885-1928',email:'jena1224@naver.com',note:'',worktime:''},
+  {id:11,name:'오예원',team:'마케팅팀',role:'마케팅/홍보',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-06-08',end:'2026-08-28',phone:'010-4783-4686',email:'vs0170@naver.com',note:'',worktime:''},
+  {id:12,name:'최보은',team:'브랜드팀',role:'MD',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-06-22',end:'2026-09-11',phone:'010-2487-2116',email:'bo9rlo7@naver.com',note:'',worktime:''},
+  {id:13,name:'김도연',team:'브랜드팀',role:'마케팅/홍보',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-07-01',end:'2026-09-30',phone:'010-3431-0729',email:'kimdy3431@naver.com',note:'',worktime:''},
+  {id:14,name:'박소원',team:'커머스팀',role:'MD',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p1',start:'2026-07-13',end:'2026-10-12',phone:'010-6683-2041',email:'sowon0812@naver.com',note:'',worktime:''},
+  {id:15,name:'영커리언스 예정1',team:'마케팅팀',role:'마케팅/홍보',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p3',start:'2026-09-01',end:'2026-12-31',phone:'',email:'',note:'',worktime:''},
+  {id:16,name:'영커리언스 예정2',team:'마케팅팀',role:'마케팅/홍보',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p3',start:'2026-09-01',end:'2026-12-31',phone:'',email:'',note:'',worktime:''},
+  {id:17,name:'영커리언스 예정3',team:'마케팅팀-디자인',role:'디자인',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p3',start:'2026-09-01',end:'2026-12-31',phone:'',email:'',note:'',worktime:''},
+  {id:18,name:'영커리언스 예정4',team:'브랜드팀',role:'마케팅/홍보',subrole:'',grade:'해당사항없음',univ:'',major:'해당사항없음',period:'p3',start:'2026-09-01',end:'2026-12-31',phone:'',email:'',note:'',worktime:''},
 ];
 
 // ══ STATE ════════════════════════════════════════════
@@ -703,7 +730,20 @@ let cfg=null,interns=[],periods=[],attData={},nextId=19;
 let editingId=null,pendingDelId=null,pfEditing=null,pfColorIdx=0;
 let deletedIds=new Set(); // ⑧ Fix: 삭제된 인턴 ID를 기억해 병합 시 되살아나지 않도록 함
 let teamNeedsDirty=false; // 이번 세션에서 필요인원을 직접 수정했는지 여부 (병합 시 덮어쓰기 방지)
-let curMonth=6,curYear=2025,attTeam='all',ganttFilter='all',syncTimer=null;
+let curMonth=6,curYear=2026,attTeam='all',ganttFilter='all',syncTimer=null;
+
+// ══ MIGRATION ═══════════════════════════════════════
+// 팀명 변경: 디자인팀 → 마케팅팀-디자인 (Gist에 남아있는 옛 데이터도 자동 변환)
+function migrateTeamNames(){
+  const OLD='디자인팀', NEW='마케팅팀-디자인';
+  if(Array.isArray(interns)){
+    interns.forEach(i=>{ if(i && i.team===OLD) i.team=NEW; });
+  }
+  if(teamNeeds && Object.prototype.hasOwnProperty.call(teamNeeds,OLD)){
+    if(teamNeeds[NEW]==null) teamNeeds[NEW]=teamNeeds[OLD];
+    delete teamNeeds[OLD];
+  }
+}
 
 // ══ UTILS ════════════════════════════════════════════
 function pad(n){return String(n).padStart(2,'0');}
@@ -794,6 +834,7 @@ async function doLogin(){
       nextId=data.nextId||19;
       teamNeeds=data.teamNeeds||{...DEFAULT_TEAM_NEEDS};
     }else{interns=[...DEFAULT_INTERNS];periods=[...DEFAULT_PERIODS];attData={};nextId=19;teamNeeds={...DEFAULT_TEAM_NEEDS};}
+    migrateTeamNames();
     hideLoading();launchApp();
   }catch(e){errEl.textContent='GitHub 연결 실패: '+e.message;errEl.style.display='block';hideLoading();document.getElementById('screen-login').style.display='flex';}
   finally{btn.disabled=false;btn.textContent='로그인';}
@@ -831,6 +872,8 @@ async function syncNow(){
         Object.entries(remoteAtt).forEach(([k,v])=>{if(attData[k]===undefined)attData[k]=v;});
         // 필요인원 설정 병합: 이번 세션에서 로컬 수정이 없었다면 원격 값 채택
         if(remote.teamNeeds&&!teamNeedsDirty) teamNeeds=remote.teamNeeds;
+        // 병합된 데이터에서도 옛 팀명 자동 변환
+        migrateTeamNames();
         // Gist 비밀번호 해시 최신화
         if(remote.passwordHash&&remote.passwordHash!==cfg.passwordHash){
           cfg.passwordHash=remote.passwordHash;
@@ -883,6 +926,7 @@ async function refreshData(){
       attData=data.attendance||{};
       nextId=data.nextId||19;
       teamNeeds=data.teamNeeds||{...DEFAULT_TEAM_NEEDS};
+      migrateTeamNames();
       renderAll();
       if(document.getElementById('tab-attendance').classList.contains('active'))renderAtt();
       if(document.getElementById('tab-settings').classList.contains('active'))renderPeriods();
@@ -983,11 +1027,17 @@ function renderDashboard(){
   const fillRate=totalNeed>0?Math.round(totalActualNow/totalNeed*100):0;
   const fillColor=fillRate<100?'#B4232E':fillRate===100?'#0C6B51':'#8F570A';
 
+  // 근무시간 분포 (5시간 / 8시간 / 미설정)
+  const total5h=interns.filter(i=>i.worktime==='5시간').length;
+  const total8h=interns.filter(i=>i.worktime==='8시간').length;
+  const totalNoWt=interns.length-total5h-total8h;
+
   document.getElementById('dash-stats').innerHTML=[
     {l:'총 인턴',v:interns.length,s:'전체 등록 인원',a:'#4F46B8'},
     {l:'진행중',v:active,s:'현재 활동 인원',a:'#0C6B51'},
     {l:'예정',v:upcoming,s:'참여 예정 인원',a:'#155FA3'},
     {l:'완료',v:done,s:'종료된 인원',a:'#AAA9A6'},
+    {l:'근무시간 분포',v:`5h·${total5h} / 8h·${total8h}`,s:totalNoWt>0?`미설정 ${totalNoWt}명`:'전원 설정 완료',a:'#B8631E'},
     {l:'기간 유형',v:periods.length,s:'설정된 참여기간 수',a:'#8F570A'},
     {l:'이번 달 충원율',v:`${fillRate}%`,s:`${totalActualNow}/${totalNeed}명 (${KO_MONTHS[curM]})`,a:fillColor},
   ].map(s=>`<div class="stat-card" style="--accent:${s.a}"><div class="stat-label">${s.l}</div><div class="stat-value">${s.v}</div><div class="stat-sub">${s.s}</div></div>`).join('');
@@ -998,8 +1048,32 @@ function renderDashboard(){
   renderGantt();
 
   const mx=Math.max(1,...TEAMS.map(t=>interns.filter(i=>i.team===t).length));
-  document.getElementById('dash-teams').innerHTML=TEAMS.map(t=>{const n=interns.filter(i=>i.team===t).length,c=TC[t];return `<div class="team-bar-row"><div class="team-bar-label">${t}</div><div class="team-bar-bg"><div class="team-bar-fill" style="width:${Math.round(n/mx*100)}%;background:${c.dark}"></div></div><div class="team-bar-n">${n}</div></div>`;}).join('');
-  document.getElementById('dash-periods').innerHTML=periods.length?periods.map(p=>{const n=interns.filter(i=>i.period===p.id).length,col=PERIOD_COLORS[p.colorIdx];return `<div class="period-row" style="background:${col.bg}"><span style="font-size:11px;font-weight:500;color:${col.fg}">${p.label}</span><span style="font-family:'DM Mono',monospace;font-size:11px;color:${col.fg}">${n}명</span></div>`;}).join(''):'<div style="font-size:11px;color:var(--t4);padding:8px">설정에서 참여기간을 추가하세요</div>';
+  document.getElementById('dash-teams').innerHTML=TEAMS.map(t=>{
+    const teamInterns=interns.filter(i=>i.team===t);
+    const n=teamInterns.length;
+    const n5=teamInterns.filter(i=>i.worktime==='5시간').length;
+    const n8=teamInterns.filter(i=>i.worktime==='8시간').length;
+    const c=TC[t];
+    const barW=Math.round(n/mx*100);
+    const known=n5+n8;
+    // 5시간(dark) + 8시간(mid) 분할 표시. worktime 미설정 인원이 있으면 나머지 영역은 dark로 채움
+    let inner;
+    if(known>0){
+      const pct5=Math.round(n5/known*100);
+      inner=`<div class="team-bar-fill" style="width:${barW}%;background:${c.dark};display:flex;overflow:hidden">
+        <div style="width:${pct5}%;height:100%;background:${c.dark}"></div>
+        <div style="width:${100-pct5}%;height:100%;background:${c.mid}"></div>
+      </div>`;
+    }else{
+      inner=`<div class="team-bar-fill" style="width:${barW}%;background:${c.dark}"></div>`;
+    }
+    return `<div class="team-bar-row">
+      <div class="team-bar-label">${t}</div>
+      <div class="team-bar-bg">${inner}</div>
+      <div class="team-bar-n">${n}</div>
+      <div class="team-bar-wt"><span style="color:${c.dark}">5h·${n5}</span><span class="sep">/</span><span style="color:${c.mid}">8h·${n8}</span></div>
+    </div>`;
+  }).join('');
 }
 
 // ══ HEATMAP ══════════════════════════════════════════
@@ -1068,43 +1142,79 @@ function renderOfficeMatrix(){
 }
 
 function renderStaffing(){
-  const months=getTimelineMonths();
   const teams=Object.keys(teamNeeds);
-  const shortages=[]; // {team,year,month,diff}
+  const now=new Date(),curY=now.getFullYear(),curM=now.getMonth();
 
-  let h='<thead><tr><th class="staff-head-team">팀 (필요인원)</th>';
-  months.forEach(({year,month})=>{h+=`<th class="staff-head-month"><span class="mo-name">${KO_MONTHS[month]}</span><span class="mo-year">${year}</span></th>`;});
-  h+='</tr></thead><tbody>';
-
-  teams.forEach(team=>{
-    const need=teamNeeds[team],c=TC[team];
-    h+=`<tr><td class="staff-team-label"><div class="staff-team-name"><span style="width:8px;height:8px;border-radius:50%;background:${c?c.dark:'#888'};flex-shrink:0;display:inline-block"></span>${team} <span class="staff-team-need">(필요 ${need}명)</span></div></td>`;
-    months.forEach(({year,month})=>{
-      const actual=interns.filter(i=>i.team===team&&isActiveInMonth(i,year,month)).length;
-      const diff=actual-need;
-      const cls=diff<0?'short':diff===0?'ok':'over';
-      if(diff<0)shortages.push({team,year,month,diff});
-      const diffLabel=diff===0?'충족':(diff>0?`+${diff}`:`${diff}`);
-      const names=interns.filter(i=>i.team===team&&isActiveInMonth(i,year,month)).map(i=>i.name).join(', ')||'없음';
-      h+=`<td class="staff-cell ${cls}" title="${team} ${KO_MONTHS[month]}: ${names}"><div class="staff-count">${actual}/${need}</div><div class="staff-diff">${diffLabel}</div></td>`;
-    });
-    h+='</tr>';
-  });
-  h+='</tbody>';
-  document.getElementById('staff-table').innerHTML=h;
-
-  // 요약 배지
-  const sumEl=document.getElementById('staff-summary');
-  if(shortages.length===0){
-    sumEl.className='staff-summary ok';
-    sumEl.innerHTML='✅ 모든 팀이 전 기간 필요인원을 충족하고 있습니다.';
-  }else{
-    const byTeam={};
-    shortages.forEach(s=>{(byTeam[s.team]=byTeam[s.team]||[]).push(`${KO_MONTHS[s.month]}(${s.diff}명)`);});
-    const parts=Object.entries(byTeam).map(([team,list])=>`<b>${team}</b> ${list.join(', ')}`);
-    sumEl.className='staff-summary';
-    sumEl.innerHTML=`⚠️ 인원 부족: ${parts.join(' · ')}`;
+  function statForMonth(team,y,m){
+    const need=teamNeeds[team];
+    const actual=interns.filter(i=>i.team===team&&isActiveInMonth(i,y,m)).length;
+    const diff=actual-need;
+    const status=diff<0?'short':diff===0?'ok':'over';
+    return {need,actual,diff,status};
   }
+  function offsetMonth(y,m,k){
+    const t=m+k;
+    return {y:y+Math.floor(t/12),m:((t%12)+12)%12};
+  }
+
+  const data=teams.map(team=>{
+    const cur=statForMonth(team,curY,curM);
+    const future=[1,2,3].map(k=>{
+      const {y,m}=offsetMonth(curY,curM,k);
+      return {...statForMonth(team,y,m),m};
+    });
+    return {team,cur,future};
+  });
+
+  // ── 상단 알림바 ─────────────
+  const totalNeed=data.reduce((s,d)=>s+d.cur.need,0);
+  const totalActual=data.reduce((s,d)=>s+d.cur.actual,0);
+  const fillRate=totalNeed>0?Math.round(totalActual/totalNeed*100):100;
+  const shortages=data.filter(d=>d.cur.status==='short');
+  const overages=data.filter(d=>d.cur.status==='over');
+
+  const sumEl=document.getElementById('staff-summary');
+  const allOk=shortages.length===0&&overages.length===0;
+  sumEl.className='staff-summary'+(allOk?' ok':'');
+  const rateHTML=`<div class="ss-rate">${fillRate}<span>%</span></div>`;
+  const subLine=`${KO_MONTHS[curM]} 기준 · 필요 ${totalNeed}명 중 ${totalActual}명 배치`;
+  if(allOk){
+    sumEl.innerHTML=`<div class="ss-icon">✅</div><div class="ss-body"><div class="ss-title">모든 팀이 이번 달 필요인원을 충족합니다</div><div class="ss-sub">${subLine}</div></div>${rateHTML}`;
+  }else{
+    const parts=[];
+    if(shortages.length)parts.push(`부족 ${shortages.map(d=>`${d.team} ${d.cur.diff}명`).join(', ')}`);
+    if(overages.length)parts.push(`과다 ${overages.map(d=>`${d.team} +${d.cur.diff}명`).join(', ')}`);
+    sumEl.innerHTML=`<div class="ss-icon">⚠️</div><div class="ss-body"><div class="ss-title">${parts.join(' · ')}</div><div class="ss-sub">${subLine}</div></div>${rateHTML}`;
+  }
+
+  // ── 팀별 카드 ─────────────
+  const R=26,CIRC=2*Math.PI*R;
+  const gridEl=document.getElementById('tpc-grid');
+  gridEl.innerHTML=data.map(({team,cur,future})=>{
+    const c=TC[team]||{dark:'#888'};
+    const pct=cur.need>0?Math.min(100,Math.round(cur.actual/cur.need*100)):0;
+    const dashoff=CIRC*(1-Math.min(1,cur.actual/(cur.need||1)));
+    let statusText,statusIcon;
+    if(cur.status==='ok'){statusText='충족';statusIcon='✓';}
+    else if(cur.status==='short'){statusText=`${Math.abs(cur.diff)}명 부족`;statusIcon='−';}
+    else{statusText=`+${cur.diff}명 과다`;statusIcon='+';}
+    const futureBarsHTML=future.map(f=>{
+      const tip=`${KO_MONTHS[f.m]}: ${f.actual}/${f.need}${f.status==='short'?` (${f.diff}명 부족)`:f.status==='over'?` (+${f.diff}명 과다)`:''}`;
+      return `<span class="tpc-future-bar ${f.status}" title="${tip}"></span>`;
+    }).join('');
+    return `<div class="tpc" title="${team}: 이번 달 ${cur.actual}/${cur.need} (${pct}%)">
+      <div class="tpc-header"><span class="tpc-dot" style="background:${c.dark}"></span><span class="tpc-name">${team}</span></div>
+      <div class="tpc-ring-wrap">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="${R}" fill="none" stroke="#F1EFE8" stroke-width="4"/>
+          <circle cx="32" cy="32" r="${R}" fill="none" stroke="${c.dark}" stroke-width="4" stroke-dasharray="${CIRC.toFixed(2)}" stroke-dashoffset="${dashoff.toFixed(2)}" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+        </svg>
+        <div class="tpc-fraction">${cur.actual}/${cur.need}</div>
+      </div>
+      <div class="tpc-status ${cur.status}">${statusIcon} ${statusText}</div>
+      <div class="tpc-future"><span class="tpc-future-label">향후 3개월</span><div class="tpc-future-bars">${futureBarsHTML}</div></div>
+    </div>`;
+  }).join('');
 }
 
 // ══ GANTT ════════════════════════════════════════════
@@ -1152,6 +1262,12 @@ function renderGantt(){
       const barBg=st.label==='완료'?'#C0BDB8':c.dark;
       const barOpacity=st.label==='완료'?'.55':'1';
 
+      // 근무시간 시각화: 5시간=solid, 8시간=대각선 스트라이프 오버레이
+      const wt=intern.worktime||'';
+      const wtStripe=wt==='8시간'?`background-image:repeating-linear-gradient(45deg,transparent 0,transparent 3px,rgba(255,255,255,.28) 3px,rgba(255,255,255,.28) 6px);`:'';
+      const wtBadge=wt?`<span style="background:rgba(255,255,255,.28);padding:0 4px;border-radius:3px;margin-right:5px;font-size:8px;font-weight:700;letter-spacing:.3px">${wt==='5시간'?'5h':'8h'}</span>`:'';
+      const wtTitle=wt?` · 근무 ${wt}`:'';
+
       html+=`<div class="gantt-intern-row" style="--mo-w:${moW}">
         <div class="gantt-intern-name">
           <span class="gantt-status-dot" style="background:${st.fg}"></span>
@@ -1159,8 +1275,8 @@ function renderGantt(){
         </div>
         <div class="gantt-bar-area" style="--mo-w:${moW}">
           ${showToday?`<div class="gantt-today-line" style="left:${todayPct}%"></div>`:''}
-          <div class="gantt-bar" style="left:${leftPct}%;width:${widPct}%;background:${barBg};opacity:${barOpacity}" title="${intern.name}: ${intern.start} ~ ${intern.end} (${st.label})">
-            <span class="gantt-bar-label">${intern.name} · ${intern.role}</span>
+          <div class="gantt-bar" style="left:${leftPct}%;width:${widPct}%;background:${barBg};${wtStripe}opacity:${barOpacity}" title="${intern.name}: ${intern.start} ~ ${intern.end} (${st.label})${wtTitle}">
+            <span class="gantt-bar-label">${wtBadge}${intern.name} · ${intern.role}</span>
           </div>
         </div>
       </div>`;
@@ -1198,11 +1314,11 @@ function buildFilters(){const sel=document.getElementById('q-team');sel.innerHTM
 function populatePeriodFilter(){const sel=document.getElementById('q-period');const cur=sel.value;sel.innerHTML='<option value="">전체 기간</option>';periods.forEach(p=>sel.innerHTML+=`<option value="${p.id}">${p.label}</option>`);if(cur)sel.value=cur;}
 function populatePeriodSelect(){const sel=document.getElementById('f-period');const cur=sel.value;sel.innerHTML='<option value="">선택</option>';periods.forEach(p=>sel.innerHTML+=`<option value="${p.id}">${p.label}</option>`);sel.innerHTML+=`<option value="${NONE_PERIOD_ID}">해당사항없음</option>`;if(cur)sel.value=cur;}
 function renderRoster(){
-  const q=document.getElementById('q-name').value.trim(),qt=document.getElementById('q-team').value,qr=document.getElementById('q-role').value,qp=document.getElementById('q-period').value,qs=document.getElementById('q-status').value;
-  const list=interns.filter(i=>{if(q&&!i.name.includes(q))return false;if(qt&&i.team!==qt)return false;if(qr&&i.role!==qr)return false;if(qp&&i.period!==qp)return false;if(qs&&getStatus(i.start,i.end).label!==qs)return false;return true;});
+  const q=document.getElementById('q-name').value.trim(),qt=document.getElementById('q-team').value,qr=document.getElementById('q-role').value,qp=document.getElementById('q-period').value,qs=document.getElementById('q-status').value,qw=document.getElementById('q-worktime').value;
+  const list=interns.filter(i=>{if(q&&!i.name.includes(q))return false;if(qt&&i.team!==qt)return false;if(qr&&i.role!==qr)return false;if(qp&&i.period!==qp)return false;if(qs&&getStatus(i.start,i.end).label!==qs)return false;if(qw){if(qw==='__none__'){if(i.worktime)return false;}else if(i.worktime!==qw)return false;}return true;});
   document.getElementById('fc').textContent=`${list.length} / ${interns.length}명`;
-  if(!list.length){document.getElementById('roster-body').innerHTML='<tr><td colspan="11"><div class="empty-state"><div style="font-size:32px;margin-bottom:8px">🔍</div><p>검색 결과가 없습니다</p></div></td></tr>';return;}
-  document.getElementById('roster-body').innerHTML=list.map((i,idx)=>{const c=TC[i.team]||{dark:'#888',light:'#EEE'},st=getStatus(i.start,i.end);return `<tr><td style="color:var(--t4);font-family:'DM Mono',monospace;font-size:11px">${idx+1}</td><td style="font-weight:600">${i.name}</td><td><span class="team-pill" style="background:${c.light};color:${c.dark}"><span style="width:6px;height:6px;border-radius:50%;background:${c.dark};display:inline-block"></span>${i.team}</span></td><td>${i.role}${i.subrole?`<span style="color:var(--t4);font-size:10px;margin-left:4px">${i.subrole}</span>`:''}${i.worktime?`<span style="color:var(--t4);font-size:10px;margin-left:4px">· ${i.worktime}</span>`:''}</td><td style="color:var(--t3)">${i.grade}</td><td style="color:var(--t3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.major}</td><td style="color:var(--t3);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.org||'-'}</td><td><span class="period-chip" style="background:${pBg(i.period)};color:${pFg(i.period)}">${pLabel(i.period)}</span></td><td style="color:var(--t3);font-family:'DM Mono',monospace;font-size:10px">${i.start} ~ ${i.end}</td><td><span class="period-chip" style="background:${st.bg};color:${st.fg}">${st.label}</span></td><td><div class="action-btns"><button class="btn-edit" onclick="openDrawer(${i.id})">✏️</button><button class="btn-del" onclick="showDel(${i.id})">🗑</button></div></td></tr>`;}).join('');
+  if(!list.length){document.getElementById('roster-body').innerHTML='<tr><td colspan="13"><div class="empty-state"><div style="font-size:32px;margin-bottom:8px">🔍</div><p>검색 결과가 없습니다</p></div></td></tr>';return;}
+  document.getElementById('roster-body').innerHTML=list.map((i,idx)=>{const c=TC[i.team]||{dark:'#888',light:'#EEE'},st=getStatus(i.start,i.end);return `<tr><td style="color:var(--t4);font-family:'DM Mono',monospace;font-size:11px">${idx+1}</td><td style="font-weight:600">${i.name}</td><td><span class="team-pill" style="background:${c.light};color:${c.dark}"><span style="width:6px;height:6px;border-radius:50%;background:${c.dark};display:inline-block"></span>${i.team}</span></td><td>${i.role}${i.subrole?`<span style="color:var(--t4);font-size:10px;margin-left:4px">${i.subrole}</span>`:''}${i.worktime?`<span style="color:var(--t4);font-size:10px;margin-left:4px">· ${i.worktime}</span>`:''}</td><td style="color:var(--t3)">${i.grade}</td><td style="color:var(--t3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.major}</td><td style="color:var(--t3);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.org||'-'}</td><td><span class="period-chip" style="background:${pBg(i.period)};color:${pFg(i.period)}">${pLabel(i.period)}</span></td><td style="color:var(--t3);font-family:'DM Mono',monospace;font-size:10px">${i.start} ~ ${i.end}</td><td><span class="period-chip" style="background:${st.bg};color:${st.fg}">${st.label}</span></td><td style="color:var(--t3);font-family:'DM Mono',monospace;font-size:10.5px;white-space:nowrap">${i.phone||'-'}</td><td style="color:var(--t3);font-size:11px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${i.email||''}">${i.email||'-'}</td><td><div class="action-btns"><button class="btn-edit" onclick="openDrawer(${i.id})">✏️</button><button class="btn-del" onclick="showDel(${i.id})">🗑</button></div></td></tr>`;}).join('');
 }
 
 // ══ DRAWER ═══════════════════════════════════════════
@@ -1210,7 +1326,7 @@ function openDrawer(id=null){editingId=id;document.querySelectorAll('.form-input
 function closeDrawer(){document.getElementById('overlay').classList.remove('show');document.getElementById('drawer').classList.remove('open');editingId=null;}
 function updateTPreview(){const t=document.getElementById('f-team').value,dot=document.getElementById('tp-dot'),name=document.getElementById('tp-name'),prev=document.getElementById('team-preview');if(t&&TC[t]){dot.style.background=TC[t].dark;name.textContent=t;name.style.color=TC[t].dark;prev.style.background=TC[t].light;prev.style.borderColor=TC[t].mid;}else{dot.style.background='transparent';name.textContent='팀을 선택하세요';name.style.color='var(--t4)';prev.style.background='var(--bg)';prev.style.borderColor='var(--border2)';}}
 function saveIntern(){
-  const req=['f-name','f-grade','f-univ','f-major','f-role','f-team','f-period','f-start','f-end'];
+  const req=['f-name','f-grade','f-major','f-role','f-team','f-period','f-start','f-end'];
   let ok=true;req.forEach(id=>{const el=document.getElementById(id);el.classList.remove('err');if(!el.value.trim()){el.classList.add('err');ok=false;}});
   if(!ok){toast('필수 항목을 모두 입력해주세요','err');return;}
   const office={};WEEKDAYS.forEach(d=>{office[d]=document.getElementById('f-office-'+d).value;});
@@ -1226,6 +1342,28 @@ function saveIntern(){
 function showDel(id){pendingDelId=id;const i=interns.find(x=>x.id===id);document.getElementById('del-sub').textContent=`${i.name} (${i.team})을(를) 삭제합니다.`;document.getElementById('del-ov').classList.add('show');document.getElementById('del-confirm').classList.add('show');}
 function closeDelConfirm(){document.getElementById('del-ov').classList.remove('show');document.getElementById('del-confirm').classList.remove('show');pendingDelId=null;}
 function confirmDel(){const i=interns.find(x=>x.id===pendingDelId);deletedIds.add(pendingDelId);interns=interns.filter(x=>x.id!==pendingDelId);toast(`${i.name}이(가) 삭제되었습니다`);closeDelConfirm();renderAll();syncNow().catch(()=>{});}
+
+// ══ 명단 재설정 ══════════════════════════════════════
+function openResetInternsConfirm(){
+  document.getElementById('reset-cur-count').textContent=interns.length;
+  document.getElementById('reset-ov').classList.add('show');
+  document.getElementById('reset-confirm').classList.add('show');
+}
+function closeResetInternsConfirm(){
+  document.getElementById('reset-ov').classList.remove('show');
+  document.getElementById('reset-confirm').classList.remove('show');
+}
+function confirmResetInterns(){
+  // 명단만 교체, 다른 데이터(periods/teamNeeds/attendance)는 보존
+  interns=JSON.parse(JSON.stringify(DEFAULT_INTERNS));
+  nextId=Math.max(0,...interns.map(i=>i.id))+1;
+  deletedIds.clear(); // 시드에서 삭제된 것으로 처리되지 않도록 초기화
+  closeResetInternsConfirm();
+  buildFilters();
+  renderAll();
+  toast(`인턴 명단이 초기 ${interns.length}명으로 재설정되었습니다`);
+  syncNow().catch(()=>{});
+}
 
 // ══ ATTENDANCE ═══════════════════════════════════════
 function chMonth(d){curMonth+=d;if(curMonth<0){curMonth=11;curYear--;}if(curMonth>11){curMonth=0;curYear++;}document.getElementById('mo-label').textContent=`${curYear}년 ${KO_MONTHS[curMonth]}`;renderAtt();}
@@ -1246,7 +1384,26 @@ function renderAtt(){
 }
 
 // ══ EXPORT ═══════════════════════════════════════════
-function exportCSV(){const h='이름,팀,직무,학년,대학교,전공,참여기간,시작일,종료일,상태,연락처,이메일,비고';const rows=interns.map(i=>[i.name,i.team,i.role,i.grade,i.univ,i.major,pLabel(i.period),i.start,i.end,getStatus(i.start,i.end).label,i.phone,i.email,i.note].map(v=>`"${v||''}"`).join(','));const csv='\uFEFF'+h+'\n'+rows.join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`빌리지베이비_인턴명단_${toKey(new Date())}.csv`;a.click();toast('CSV 다운로드 완료');}
+function exportCSV(){
+  // CSV 이스케이프: 큰따옴표는 두 번 반복, 값 전체를 큰따옴표로 감쌈
+  const esc=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const h=['이름','팀','직무','세부직무','근무시간','학년','대학교','전공','참여기간','시작일','종료일','상태','운영기관','월 근무처','화 근무처','수 근무처','목 근무처','금 근무처','연락처','이메일','비고'];
+  const rows=interns.map(i=>{
+    const o=i.office||{};
+    return [
+      i.name,i.team,i.role,i.subrole,i.worktime,i.grade,i.univ,i.major,
+      pLabel(i.period),i.start,i.end,getStatus(i.start,i.end).label,
+      i.org,o.mon,o.tue,o.wed,o.thu,o.fri,
+      i.phone,i.email,i.note
+    ].map(esc).join(',');
+  });
+  const csv='\uFEFF'+h.map(esc).join(',')+'\n'+rows.join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`빌리지베이비_인턴명단_${toKey(new Date())}.csv`;
+  a.click();
+  toast('CSV 다운로드 완료');
+}
 
 // ══ INIT ═════════════════════════════════════════════
 function renderAll(){renderSidebar();renderDashboard();renderRoster();populatePeriodSelect();populatePeriodFilter();}
